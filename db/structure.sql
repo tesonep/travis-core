@@ -162,7 +162,7 @@ CREATE TABLE annotations (
     id integer NOT NULL,
     job_id integer NOT NULL,
     url character varying(255),
-    description text NOT NULL,
+    description character varying(255) NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     annotation_provider_id integer NOT NULL,
@@ -1597,6 +1597,8 @@ INSERT INTO schema_migrations (version) VALUES ('20131109101056');
 INSERT INTO schema_migrations (version) VALUES ('20140120225125');
 
 INSERT INTO schema_migrations (version) VALUES ('20140121003026');
+
+INSERT INTO schema_migrations (version) VALUES ('20140130135625');
 
 INSERT INTO schema_migrations (version) VALUES ('20140204220926');
 
