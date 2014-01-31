@@ -14,14 +14,17 @@ module Travis
 
       private
 
+      def job
+        @job ||= Job.find(params[:job_id])
+      end
+
       def annotations_enabled?
-        job  = Job.find(params[:job_id])
         repo = job.repository
         Travis::Features.enabled_for_all?(:annotations) || Travis::Features.active?(:annotations, repo)
       end
 
       def annotation
-        annotation_provider.annotation_for_job(params[:job_id])
+        annotation_provider.annotation_for_job(job.id)
       end
 
       def annotation_provider
