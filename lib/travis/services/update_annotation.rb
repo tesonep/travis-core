@@ -22,6 +22,10 @@ module Travis
         @annotation_provider ||= AnnotationProvider.authenticate_provider(params[:username], params[:key])
       end
 
+      def annotation_provider_active?
+        annotation_provider.active_for_job?(job.id)
+      end
+
       def annotations_enabled?
         repo = job.repository
         Travis::Features.enabled_for_all?(:annotations) || Travis::Features.active?(:annotations, repo)

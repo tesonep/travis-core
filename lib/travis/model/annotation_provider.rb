@@ -3,6 +3,8 @@ require 'travis/model/encrypted_column'
 
 class AnnotationProvider < ActiveRecord::Base
   has_many :annotations
+  has_many :annotation_authorizations
+  has_many :repositories, through: :annotation_authorizations
 
   serialize :api_key, Travis::Model::EncryptedColumn.new
 
@@ -16,5 +18,15 @@ class AnnotationProvider < ActiveRecord::Base
 
   def annotation_for_job(job_id)
     annotations.where(job_id: job_id).first || annotations.build(job_id: job_id)
+  end
+
+  def active_for_job?(job_id)
+    job = Job.find(job_id)
+    repo = job.repository
+    unless repositories.include?(repo)
+      return false
+    end
+
+    annotation_authorizations.where(repository_id: repo.id).first.tap {|x| puts "foo: #{x}"}.active
   end
 end

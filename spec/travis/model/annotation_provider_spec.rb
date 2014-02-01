@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe AnnotationProvider do
-  include Support::ActiveRecord
+  include Travis::Testing::Stubs, Support::ActiveRecord
 
   let(:provider) { Factory(:annotation_provider) }
 
@@ -51,5 +51,50 @@ describe AnnotationProvider do
         provider.annotation_for_job(job.id).new_record?.should be_true
       end
     end
+  end
+
+  describe '#active_for_job?' do
+    let(:build)   { stub_build(state: :failed, repository: repository) }
+    let(:subject) { Travis::Addons::Email::EventHandler }
+    let(:payload) { Travis::Api.data(build, for: 'event', version: 'v0') }
+    let(:repository) {
+      stub_repo(users: [
+        stub_user(emails: [stub_email(email: 'author-1@email.com'   )]),
+        stub_user(emails: [stub_email(email: 'committer-1@email.com')])
+      ])
+    }
+    let(:job) { Job::Test.create!(owner: Factory(:user), repository: repository,
+      commit: Factory(:commit), source: Factory(:build)) }
+
+    context 'when authorization for job\'s repo does not exist' do
+      it 'returns false' do
+        provider.active_for_job?(job.id).should be_false
+      end
+    end
+
+    context 'when authorization for job\'s repo exists but inactive' do
+      before :each do
+        auth = provider.annotation_authorizations.create!(active: false, repository: job.repository)
+        auth.active = false
+      end
+
+      it 'returns false' do
+        provider.active_for_job?(job.id).should be_false
+      end
+    end
+
+    context 'when authorization for job\'s repo exists and active' do
+      before :each do
+        auth = provider.annotation_authorizations.create!(active: true, repository: repository, annotation_provider: provider)
+
+      end
+
+      it 'returns false' do
+        puts "provider.annotation_authorizations: #{provider.annotation_authorizations}"
+        puts "provider.repositories: #{provider.repositories}"
+        provider.active_for_job?(job.id).should be_true
+      end
+    end
+
   end
 end
