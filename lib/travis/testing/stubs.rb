@@ -216,6 +216,18 @@ module Travis
           name: "Travis CI",
           api_username: "travis-ci",
           api_key: "0123456789abcdef",
+          repositories: [ stub_repository ],
+          annotation_authorizations: [ self ],
+        )
+      end
+
+      def stub_annotation_authorization(attributes = {})
+        Stubs.stub 'annotation_authorization', attributes.reverse_merge(
+          class: Stubs.stub('class', name: 'AnnotationAuthorization'),
+          id: 1,
+          repository: stub_repository,
+          annotation_provider: stub_annotation_provider,
+          active: true,
         )
       end
 

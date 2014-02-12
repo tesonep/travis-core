@@ -23,6 +23,8 @@ class AnnotationProvider < ActiveRecord::Base
   def active_for_job?(job_id)
     job = Job.find(job_id)
     repo = job.repository
+
+    puts "repositories: #{repositories}, repo: #{repo}"
     unless repositories.include?(repo)
       return false
     end

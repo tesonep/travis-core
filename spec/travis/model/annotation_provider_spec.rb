@@ -54,17 +54,13 @@ describe AnnotationProvider do
   end
 
   describe '#active_for_job?' do
-    let(:build)   { stub_build(state: :failed, repository: repository) }
-    let(:subject) { Travis::Addons::Email::EventHandler }
-    let(:payload) { Travis::Api.data(build, for: 'event', version: 'v0') }
-    let(:repository) {
-      stub_repo(users: [
-        stub_user(emails: [stub_email(email: 'author-1@email.com'   )]),
-        stub_user(emails: [stub_email(email: 'committer-1@email.com')])
-      ])
-    }
-    let(:job) { Job::Test.create!(owner: Factory(:user), repository: repository,
-      commit: Factory(:commit), source: Factory(:build)) }
+    let(:repository) { stub_repository }
+
+    let(:job) { Factory(:test, repository: repository) }
+
+    before :each do
+      Job.stubs(:find).with(job.id).returns job
+    end
 
     context 'when authorization for job\'s repo does not exist' do
       it 'returns false' do
@@ -73,10 +69,7 @@ describe AnnotationProvider do
     end
 
     context 'when authorization for job\'s repo exists but inactive' do
-      before :each do
-        auth = provider.annotation_authorizations.create!(active: false, repository: job.repository)
-        auth.active = false
-      end
+      let(:auth) { stub_annotation_authorization(active: false, repositories: [job.repository]) }
 
       it 'returns false' do
         provider.active_for_job?(job.id).should be_false
@@ -85,13 +78,10 @@ describe AnnotationProvider do
 
     context 'when authorization for job\'s repo exists and active' do
       before :each do
-        auth = provider.annotation_authorizations.create!(active: true, repository: repository, annotation_provider: provider)
-
+        provider.stubs(:repositories).returns( [repository] )
       end
 
-      it 'returns false' do
-        puts "provider.annotation_authorizations: #{provider.annotation_authorizations}"
-        puts "provider.repositories: #{provider.repositories}"
+      it 'returns true' do
         provider.active_for_job?(job.id).should be_true
       end
     end
