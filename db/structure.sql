@@ -122,39 +122,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: annotation_authorizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE annotation_authorizations (
-    id integer NOT NULL,
-    repository_id integer,
-    annotation_provider_id integer,
-    active boolean,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: annotation_authorizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE annotation_authorizations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: annotation_authorizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE annotation_authorizations_id_seq OWNED BY annotation_authorizations.id;
-
-
---
 -- Name: annotation_providers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -195,7 +162,7 @@ CREATE TABLE annotations (
     id integer NOT NULL,
     job_id integer NOT NULL,
     url character varying(255),
-    description character varying(255) NOT NULL,
+    description text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     annotation_provider_id integer NOT NULL,
@@ -857,13 +824,6 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY annotation_authorizations ALTER COLUMN id SET DEFAULT nextval('annotation_authorizations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
 ALTER TABLE ONLY annotation_providers ALTER COLUMN id SET DEFAULT nextval('annotation_providers_id_seq'::regclass);
 
 
@@ -970,14 +930,6 @@ ALTER TABLE ONLY urls ALTER COLUMN id SET DEFAULT nextval('urls_id_seq'::regclas
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
-
-
---
--- Name: annotation_authorizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY annotation_authorizations
-    ADD CONSTRAINT annotation_authorizations_pkey PRIMARY KEY (id);
 
 
 --
@@ -1272,13 +1224,6 @@ CREATE INDEX index_logs_on_job_id ON logs USING btree (job_id);
 
 
 --
--- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_memberships_on_user_id ON memberships USING btree (user_id);
-
-
---
 -- Name: index_organizations_on_github_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1321,24 +1266,10 @@ CREATE INDEX index_repositories_on_owner_name_and_name ON repositories USING btr
 
 
 --
--- Name: index_requests_on_commit_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_requests_on_commit_id ON requests USING btree (commit_id);
-
-
---
 -- Name: index_requests_on_head_commit; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_requests_on_head_commit ON requests USING btree (head_commit);
-
-
---
--- Name: index_requests_on_repository_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_requests_on_repository_id ON requests USING btree (repository_id);
 
 
 --
@@ -1645,11 +1576,3 @@ INSERT INTO schema_migrations (version) VALUES ('20131109101056');
 INSERT INTO schema_migrations (version) VALUES ('20140120225125');
 
 INSERT INTO schema_migrations (version) VALUES ('20140121003026');
-
-INSERT INTO schema_migrations (version) VALUES ('20140130135625');
-
-INSERT INTO schema_migrations (version) VALUES ('20140131021257');
-
-INSERT INTO schema_migrations (version) VALUES ('20140204220926');
-
-INSERT INTO schema_migrations (version) VALUES ('20140210003014');
