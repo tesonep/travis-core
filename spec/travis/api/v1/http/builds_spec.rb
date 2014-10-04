@@ -6,7 +6,7 @@ describe Travis::Api::V1::Http::Builds do
   let(:data) { Travis::Api::V1::Http::Builds.new([build]).data }
 
   it 'builds' do
-    data.first.should == {
+    expect(data.first).to eq({
       'id' => build.id,
       'event_type' => 'push', # on the build api this probably should be just 'pull_request' => true or similar
       'repository_id' => build.repository_id,
@@ -19,7 +19,7 @@ describe Travis::Api::V1::Http::Builds do
       'commit' => '62aae5f70ceee39123ef',
       'branch' => 'master',
       'message' => 'the commit message'
-    }
+    })
   end
 end
 

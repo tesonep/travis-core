@@ -14,7 +14,7 @@ describe Travis::Api::V0::Event::Build do
   end
 
   it 'includes the build data' do
-    data['build'].should == {
+    expect(data['build']).to eq({
       'id' => 1,
       'repository_id' => 1,
       'commit_id' => 1,
@@ -27,15 +27,15 @@ describe Travis::Api::V0::Event::Build do
       'started_at' => json_format_time(Time.now.utc - 1.minute),
       'finished_at' => json_format_time(Time.now.utc),
       'duration' => 60
-    }
+    })
   end
 
   it 'includes the repository data' do
-    data['repository']['owner_avatar_url'].should == 'https://github.com/roidrage.png'
+    expect(data['repository']['owner_avatar_url']).to eq('https://github.com/roidrage.png')
   end
 
   it 'includes the commit' do
-    data['commit'].should == {
+    expect(data['commit']).to eq({
       'id' => 1,
       'sha' => '62aae5f70ceee39123ef',
       'branch' => 'master',
@@ -47,11 +47,11 @@ describe Travis::Api::V0::Event::Build do
       'author_name' => 'Sven Fuchs',
       'author_email' => 'svenfuchs@artweb-design.de',
       'compare_url' => 'https://github.com/svenfuchs/minimal/compare/master...develop',
-    }
+    })
   end
 
   it "doesn't include the source key" do
     build.config[:source_key] = '1234'
-    data['build']['config']['source_key'].should == nil
+    expect(data['build']['config']['source_key']).to eq(nil)
   end
 end

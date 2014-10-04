@@ -9,12 +9,12 @@ describe Build::Config do
         - FOO=foo
         - BAR=bar
     )
-    Build::Config.new(config).normalize.slice(:env, :global_env).should == {
+    expect(Build::Config.new(config).normalize.slice(:env, :global_env)).to eq({
       env: [
         'FOO=foo',
         'BAR=bar'
       ]
-    }
+    })
   end
 
   # seems odd. is this on purpose?
@@ -24,11 +24,11 @@ describe Build::Config do
         FOO: foo
         BAR: bar
     )
-    Build::Config.new(config).normalize.slice(:env, :global_env).should == {
+    expect(Build::Config.new(config).normalize.slice(:env, :global_env)).to eq({
       env: [
         'FOO=foo BAR=bar'
       ]
-    }
+    })
   end
 
   it 'keeps env vars global and matrix arrays' do
@@ -41,7 +41,7 @@ describe Build::Config do
           - BAZ=baz
           - BUZ=buz
     )
-    Build::Config.new(config).normalize.slice(:env, :global_env).should == {
+    expect(Build::Config.new(config).normalize.slice(:env, :global_env)).to eq({
       global_env: [
         'FOO=foo',
         'BAR=bar'
@@ -50,7 +50,7 @@ describe Build::Config do
         'BAZ=baz',
         'BUZ=buz'
       ]
-    }
+    })
   end
 
   # seems odd. is this on purpose?
@@ -64,14 +64,14 @@ describe Build::Config do
           BAZ: baz
           BUZ: buz
     )
-    Build::Config.new(config).normalize.slice(:env, :global_env).should == {
+    expect(Build::Config.new(config).normalize.slice(:env, :global_env)).to eq({
       global_env: [
         'FOO=foo BAR=bar'
       ],
       env: [
         'BAZ=baz BUZ=buz'
       ]
-    }
+    })
   end
 
   it 'works fine if matrix part of env is undefined' do
@@ -79,11 +79,11 @@ describe Build::Config do
       env:
         global: FOO=foo
     )
-    Build::Config.new(config).normalize.slice(:env, :global_env).should == {
+    expect(Build::Config.new(config).normalize.slice(:env, :global_env)).to eq({
       global_env: [
         'FOO=foo'
       ]
-    }
+    })
   end
 
   it 'works fine if global part of env is undefined' do
@@ -91,11 +91,11 @@ describe Build::Config do
       env:
         matrix: FOO=foo
     )
-    Build::Config.new(config).normalize.slice(:env, :global_env).should == {
+    expect(Build::Config.new(config).normalize.slice(:env, :global_env)).to eq({
       env: [
         'FOO=foo'
       ]
-    }
+    })
   end
 
   # Seems odd. What's the usecase? Broken yaml?
@@ -109,7 +109,7 @@ describe Build::Config do
             - BAZ=baz
           - BUZ=buz
     )
-    Build::Config.new(config).normalize.slice(:env, :global_env).should == {
+    expect(Build::Config.new(config).normalize.slice(:env, :global_env)).to eq({
       global_env: [
         'FOO=foo'
       ],
@@ -117,7 +117,7 @@ describe Build::Config do
         ['BAR=bar', 'BAZ=baz'],
         'BUZ=buz'
       ]
-    }
+    })
   end
 
   # Seems super odd. Do people actually pass such stuff?
@@ -133,24 +133,24 @@ describe Build::Config do
             BAR: bar
             BAZ: baz
     )
-    Build::Config.new(config).normalize.slice(:env, :global_env).should == {
+    expect(Build::Config.new(config).normalize.slice(:env, :global_env)).to eq({
       env: [
         [{ secure: 'encrypted-value' }, 'FOO=foo'],
         ['BAR=bar BAZ=baz']
       ]
-    }
+    })
   end
 
   it 'sets the os value to osx for objective-c builds' do
     config = YAML.load %(
       language: objective-c
     )
-    Build::Config.new(config).normalize[:os].should == 'osx'
+    expect(Build::Config.new(config).normalize[:os]).to eq('osx')
   end
 
   it 'sets the os value to linux for other builds' do
     config = YAML.load %(
     )
-    Build::Config.new(config).normalize[:os].should == 'linux'
+    expect(Build::Config.new(config).normalize[:os]).to eq('linux')
   end
 end

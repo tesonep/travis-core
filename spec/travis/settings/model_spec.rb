@@ -15,11 +15,11 @@ describe Travis::Settings::Model do
   end
 
   it 'returns a default if it is set' do
-    model_class.new.awesome.should be_true
+    expect(model_class.new.awesome).to be_truthy
   end
 
   it 'allows to override the default' do
-    model_class.new(awesome: false).awesome.should be_false
+    expect(model_class.new(awesome: false).awesome).to be_falsey
   end
 
   it 'validates encrypted attributes properly' do
@@ -29,51 +29,51 @@ describe Travis::Settings::Model do
     end
 
     model = model_class.new
-    model.should_not be_valid
-    model.errors[:secret].should == [:blank]
+    expect(model).not_to be_valid
+    expect(model.errors[:secret]).to eq([:blank])
   end
 
   it 'implements read_attribute_for_serialization method' do
     model = model_class.new(name: 'foo')
-    model.read_attribute_for_serialization(:name).should == 'foo'
+    expect(model.read_attribute_for_serialization(:name)).to eq('foo')
   end
 
   it 'does not coerce nil' do
     model = model_class.new(name: nil)
-    model.name.should be_nil
+    expect(model.name).to be_nil
   end
 
   it 'can be loaded from json' do
     encrypted = Travis::Model::EncryptedColumn.new(use_prefix: false).dump('foo')
     model = model_class.load(secret: encrypted)
-    model.secret.decrypt.should == 'foo'
+    expect(model.secret.decrypt).to eq('foo')
   end
 
   it 'allows to update attributes' do
     model = model_class.new
     model.update(name: 'Piotr', loves_travis: true, height: 178)
-    model.name.should == 'Piotr'
-    model.loves_travis.should be_true
-    model.height.should == 178
+    expect(model.name).to eq('Piotr')
+    expect(model.loves_travis).to be_truthy
+    expect(model.height).to eq(178)
   end
 
   it 'creates an instance with attributes' do
     model = model_class.new(name: 'Piotr', loves_travis: true, height: 178)
-    model.name.should == 'Piotr'
-    model.loves_travis.should be_true
-    model.height.should == 178
+    expect(model.name).to eq('Piotr')
+    expect(model.loves_travis).to be_truthy
+    expect(model.height).to eq(178)
   end
 
   it 'allows to overwrite values' do
     model = model_class.new(name: 'Piotr')
     model.name = 'Peter'
-    model.name.should == 'Peter'
+    expect(model.name).to eq('Peter')
   end
 
   it 'coerces values by default' do
     model = model_class.new(height: '178', loves_travis: 'true')
-    model.height.should == 178
-    model.loves_travis.should == true
+    expect(model.height).to eq(178)
+    expect(model.loves_travis).to eq(true)
   end
 
   it 'allows to override attribute methods' do
@@ -84,7 +84,7 @@ describe Travis::Settings::Model do
     end
 
     model = model_class.new(name: 'piotr')
-    model.name.should == 'PIOTR'
+    expect(model.name).to eq('PIOTR')
   end
 
   it 'handles validations' do
@@ -97,8 +97,8 @@ describe Travis::Settings::Model do
     end
 
     model = model_class.new
-    model.should_not be_valid
-    model.errors[:name].should == [:blank]
+    expect(model).not_to be_valid
+    expect(model.errors[:name]).to eq([:blank])
   end
 
   describe 'encryption' do
@@ -109,17 +109,17 @@ describe Travis::Settings::Model do
     end
 
     it 'returns EncryptedValue instance even for nil values' do
-      model_class.new.secret.should be_a Travis::Settings::EncryptedValue
+      expect(model_class.new.secret).to be_a Travis::Settings::EncryptedValue
     end
 
     it 'automatically encrypts the data' do
       encrypted_column = Travis::Model::EncryptedColumn.new(use_prefix: false)
       model = model_class.new secret: 'foo'
-      encrypted_column.load(model.secret).should == 'foo'
-      model.secret.decrypt.should == 'foo'
+      expect(encrypted_column.load(model.secret)).to eq('foo')
+      expect(model.secret.decrypt).to eq('foo')
 
-      encrypted_column.load(model.to_hash[:secret].to_s).should == 'foo'
-      encrypted_column.load(JSON.parse(model.to_json)['secret']).should == 'foo'
+      expect(encrypted_column.load(model.to_hash[:secret].to_s)).to eq('foo')
+      expect(encrypted_column.load(JSON.parse(model.to_json)['secret'])).to eq('foo')
     end
   end
 end

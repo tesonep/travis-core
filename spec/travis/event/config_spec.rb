@@ -65,7 +65,7 @@ describe Travis::Event::Config do
         )
         payload = Travis::Api.data(build, for: 'event', version: 'v0')
         config  = Travis::Event::Config.new(payload)
-        config.send_on_finished_for?(:webhooks).should == result
+        expect(config.send_on_finished_for?(:webhooks)).to eq(result)
       end
     end
   end

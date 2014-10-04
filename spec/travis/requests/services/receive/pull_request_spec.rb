@@ -14,17 +14,17 @@ describe Travis::Requests::Services::Receive::PullRequest do
       end
 
       it 'returns true' do
-        payload.accept?.should be_true
+        expect(payload.accept?).to be_truthy
       end
 
       it 'rejects it if there is no merge commit' do
         payload.event.data['pull_request']['merge_commit'] = nil
-        payload.should_not be_accept
+        expect(payload).not_to be_accept
       end
 
       it "rejects when the feature is disabled" do
         Travis::Features.disable_for_all(:pull_requests)
-        payload.accept?.should be_false
+        expect(payload.accept?).to be_falsey
       end
     end
 
@@ -34,7 +34,7 @@ describe Travis::Requests::Services::Receive::PullRequest do
       end
 
       it 'returns true' do
-        payload.accept?.should be_true
+        expect(payload.accept?).to be_truthy
       end
     end
 
@@ -47,12 +47,12 @@ describe Travis::Requests::Services::Receive::PullRequest do
 
       it 'returns true if head has changed' do
         Request.stubs(:last_by_head_commit).returns(nil)
-        payload.accept?.should be_true
+        expect(payload.accept?).to be_truthy
       end
 
       it 'returns false if base has not changed' do
         Request.stubs(:last_by_head_commit).returns(last)
-        payload.accept?.should be_false
+        expect(payload.accept?).to be_falsey
       end
     end
 
@@ -62,14 +62,14 @@ describe Travis::Requests::Services::Receive::PullRequest do
       end
 
       it 'returns false' do
-        payload.accept?.should be_false
+        expect(payload.accept?).to be_falsey
       end
     end
   end
 
   describe 'repository' do
     it 'returns all attributes required for a Repository' do
-      payload.repository.should == {
+      expect(payload.repository).to eq({
         :name => 'test-project-1',
         :description => 'Test dummy repository for testing Travis CI',
         :url => 'https://github.com/travis-repos/test-project-1',
@@ -78,33 +78,33 @@ describe Travis::Requests::Services::Receive::PullRequest do
         :owner_email => nil,
         :private => false,
         :github_id => 1615549
-      }
+      })
     end
   end
 
   describe 'owner' do
     it 'returns all attributes required for an Owner' do
-      payload.owner.should == {
+      expect(payload.owner).to eq({
         :type => 'Organization',
         :login => 'travis-repos',
         :github_id => 864347
-      }
+      })
     end
   end
 
   describe 'request' do
     it 'returns all attributes required for a Request' do
-      payload.request.should == {
+      expect(payload.request).to eq({
         :comments_url => 'https://api.github.com/repos/travis-repos/test-project-1/issues/1/comments',
         :base_commit => 'ee644876520685ea3ce144bc8449c1155cee56b4',
         :head_commit => '5442e1772f6de100a2451bd1e08824d3be37a46f'
-      }
+      })
     end
   end
 
   describe 'commit' do
     it 'returns all attributes required for a Commit' do
-      payload.commit.should == {
+      expect(payload.commit).to eq({
         :commit => 'ef34a166e2dd7780d40800890474f836c8b3fc34',
         :message => "Merge branch 'master' of git://github.com/travis-repos/test-project-1\n\nConflicts:\n\tRakefile\n",
         :branch => 'master',
@@ -115,7 +115,7 @@ describe Travis::Requests::Services::Receive::PullRequest do
         :author_name => 'Konstantin Haase',
         :author_email => 'konstantin.mailinglists@googlemail.com',
         :compare_url => 'https://github.com/travis-repos/test-project-1/pull/1'
-      }
+      })
     end
   end
 end

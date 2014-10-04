@@ -18,7 +18,7 @@ describe Request::States do
   end
 
   it 'has the state :created when just created' do
-    request.state.should == :created
+    expect(request.state).to eq(:created)
   end
 
   describe 'start' do
@@ -39,12 +39,12 @@ describe Request::States do
 
       it 'sets the state to started' do
         request.start
-        request.was_started?.should be_true
+        expect(request.was_started?).to be_truthy
       end
 
       it 'sets the result to :accepted' do
         request.start
-        request.result.should == :accepted
+        expect(request.result).to eq(:accepted)
       end
 
       describe 'but rejected config' do
@@ -57,7 +57,7 @@ describe Request::States do
 
           request.start
 
-          request.config.should be_nil
+          expect(request.config).to be_nil
         end
       end
 
@@ -71,7 +71,7 @@ describe Request::States do
 
           request.start
 
-          request.config.should be_nil
+          expect(request.config).to be_nil
         end
       end
     end
@@ -93,12 +93,12 @@ describe Request::States do
 
       it 'sets the state to started' do
         request.start
-        request.was_started?.should be_true
+        expect(request.was_started?).to be_truthy
       end
 
       it 'sets the result to :rejected' do
         request.start
-        request.result.should == :rejected
+        expect(request.result).to eq(:rejected)
       end
     end
   end
@@ -111,12 +111,12 @@ describe Request::States do
 
     it 'stores the config on the request' do
       request.configure
-      request.config.should == config
+      expect(request.config).to eq(config)
     end
 
     it 'sets the state to configured' do
       request.configure
-      request.was_configured?.should be_true
+      expect(request.was_configured?).to be_truthy
     end
   end
 
@@ -137,7 +137,7 @@ describe Request::States do
 
       it 'sets the state to finished' do
         request.finish
-        request.should be_finished
+        expect(request).to be_finished
       end
     end
 
@@ -153,7 +153,7 @@ describe Request::States do
 
       it 'sets the state to finished' do
         request.finish
-        request.should be_finished
+        expect(request).to be_finished
       end
     end
 
@@ -209,7 +209,7 @@ describe Request::States do
       request.repository_id = request.repository.id
       request.save!
       request.start!
-      request.reload.should be_finished
+      expect(request.reload).to be_finished
     end
   end
 
@@ -226,13 +226,13 @@ describe Request::States do
 
     it "should create a build" do
       request.save
-      request.add_build_and_notify.should be_a(Build)
+      expect(request.add_build_and_notify).to be_a(Build)
     end
 
     it "should notify the build" do
       request.save
       Travis::Event.expects(:dispatch).with do |event, *args|
-        event.should == "build:created"
+        expect(event).to eq("build:created")
       end
       request.add_build_and_notify
     end

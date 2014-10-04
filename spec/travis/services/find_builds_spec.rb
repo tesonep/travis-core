@@ -12,45 +12,45 @@ describe Travis::Services::FindBuilds do
   describe 'run' do
     it 'finds recent builds when empty params given' do
       @params = { :repository_id => repo.id }
-      service.run.should == [build]
+      expect(service.run).to eq([build])
     end
 
     it 'finds recent builds when no repo given' do
       @params = nil
-      service.run.should == [build]
+      expect(service.run).to eq([build])
     end
 
     it 'finds builds older than the given number' do
       @params = { :repository_id => repo.id, :after_number => 2 }
-      service.run.should == [build]
+      expect(service.run).to eq([build])
     end
 
     it 'finds builds with a given number, scoped by repository' do
       @params = { :repository_id => repo.id, :number => 1 }
       Factory(:build, :repository => Factory(:repository), :state => :finished, :number => 1)
       Factory(:build, :repository => repo, :state => :finished, :number => 2)
-      service.run.should == [build]
+      expect(service.run).to eq([build])
     end
 
     it 'does not find by number if repository_id is missing' do
       @params = { :number => 1 }
-      service.run.should == Build.none
+      expect(service.run).to eq(Build.none)
     end
 
     it 'scopes to the given repository_id' do
       @params = { :repository_id => repo.id }
       Factory(:build, :repository => Factory(:repository), :state => :finished)
-      service.run.should == [build]
+      expect(service.run).to eq([build])
     end
 
     it 'returns an empty build scope when the repository could not be found' do
       @params = { :repository_id => repo.id + 1 }
-      service.run.should == Build.none
+      expect(service.run).to eq(Build.none)
     end
 
     it 'finds builds by a given list of ids' do
       @params = { :ids => [build.id] }
-      service.run.should == [build]
+      expect(service.run).to eq([build])
     end
 
     describe 'with pull requests' do
@@ -58,7 +58,7 @@ describe Travis::Services::FindBuilds do
         request = Factory(:request, :event_type => 'pull_request')
         pull_request = Factory(:build, :repository => repo, :state => :finished, :number => 2, :request => request)
         @params = { :event_type => 'pull_request', :repository_id => repo.id }
-        service.run.should == [pull_request]
+        expect(service.run).to eq([pull_request])
       end
     end
   end

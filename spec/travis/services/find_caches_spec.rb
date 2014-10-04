@@ -21,7 +21,7 @@ describe Travis::Services::FindCaches do
     let(:params) {{ repository_id: repo.id }}
 
     describe 'without any caches' do
-      it { should be == [] }
+      it { is_expected.to eq([]) }
     end
 
     describe 'with caches' do
@@ -31,35 +31,66 @@ describe Travis::Services::FindCaches do
         s3_bucket << "#{repo.github_id.succ}/master/cache--example3.tbz"
       end
 
-      its(:size) { should be == 2 }
+      describe '#size' do
+        subject { super().size }
+        it { is_expected.to eq(2) }
+      end
 
       describe 'the cache instances' do
         subject { result.first }
-        its(:slug)       { should be == 'cache--example1' }
-        its(:branch)     { should be == 'master' }
-        its(:repository) { should be == repo }
-        its(:size)       { should be == 0 }
+
+        describe '#slug' do
+          subject { super().slug }
+          it { is_expected.to eq('cache--example1') }
+        end
+
+        describe '#branch' do
+          subject { super().branch }
+          it { is_expected.to eq('master') }
+        end
+
+        describe '#repository' do
+          subject { super().repository }
+          it { is_expected.to eq(repo) }
+        end
+
+        describe '#size' do
+          subject { super().size }
+          it { is_expected.to eq(0) }
+        end
       end
 
       describe 'with branch' do
         let(:params) {{ repository_id: repo.id, branch: 'other' }}
-        its(:size) { should be == 1 }
+
+        describe '#size' do
+          subject { super().size }
+          it { is_expected.to eq(1) }
+        end
       end
 
       describe 'with match' do
         let(:params) {{ repository_id: repo.id, match: 'example1' }}
-        its(:size) { should be == 1 }
+
+        describe '#size' do
+          subject { super().size }
+          it { is_expected.to eq(1) }
+        end
       end
 
       describe 'without access' do
         let(:has_access) { false }
-        its(:size) { should be == 0 }
+
+        describe '#size' do
+          subject { super().size }
+          it { is_expected.to eq(0) }
+        end
       end
 
       describe 'without s3 credentials' do
         let(:cache_options) {{ }}
         before { service.logger.expects(:warn).with("[services:find-caches] S3 credentials missing") }
-        it { should be == [] }
+        it { is_expected.to eq([]) }
       end
     end
   end

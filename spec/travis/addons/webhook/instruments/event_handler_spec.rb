@@ -15,18 +15,18 @@ describe Travis::Addons::Webhook::Instruments::EventHandler do
   end
 
   it 'publishes a event' do
-    event.should publish_instrumentation_event(
+    expect(event).to publish_instrumentation_event(
       event: 'travis.addons.webhook.event_handler.notify:completed',
       message: 'Travis::Addons::Webhook::EventHandler#notify:completed (build:finished) for #<Build id=1>',
     )
-    event[:data].except(:payload).should == {
+    expect(event[:data].except(:payload)).to eq({
         repository: 'svenfuchs/minimal',
         request_id: 1,
         object_id: 1,
         object_type: 'Build',
         event: 'build:finished',
         targets: ['http://example.com']
-    }
-    event[:data][:payload].should_not be_nil
+    })
+    expect(event[:data][:payload]).not_to be_nil
   end
 end

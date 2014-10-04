@@ -8,8 +8,8 @@ describe Travis::Settings do
     }.new
 
     settings.foo = nil
-    settings.should_not be_valid
-    settings.errors[:foo].should == [:blank]
+    expect(settings).not_to be_valid
+    expect(settings.errors[:foo]).to eq([:blank])
   end
 
   describe 'adding a setting' do
@@ -24,25 +24,25 @@ describe Travis::Settings do
       settings = settings_class.new
       settings.merge('foo' => 'bar')
 
-      settings.to_hash['foo'].should be_nil
+      expect(settings.to_hash['foo']).to be_nil
     end
 
     it 'sets false properly as boolean, not changing it to nil' do
        settings = settings_class.new
 
-      settings.a_boolean_field?.should be_true
+      expect(settings.a_boolean_field?).to be_truthy
 
       settings.a_boolean_field = false
-      settings.a_boolean_field?.should == false
+      expect(settings.a_boolean_field?).to eq(false)
     end
 
     it 'allows to set a property using accessor' do
       settings = settings_class.new
 
-      settings.an_integer_field.should be_nil
+      expect(settings.an_integer_field).to be_nil
 
       settings.an_integer_field = 1
-      settings.an_integer_field.should == 1
+      expect(settings.an_integer_field).to eq(1)
     end
   end
 
@@ -62,8 +62,8 @@ describe Travis::Settings do
     it 'creates a model for a given key' do
       result = settings.create(:item, name: 'foo')
 
-      settings.item.name.should == 'foo'
-      result.should == settings.item
+      expect(settings.item.name).to eq('foo')
+      expect(result).to eq(settings.item)
     end
 
     it 'adds additional attributes to the created model' do
@@ -71,8 +71,8 @@ describe Travis::Settings do
 
       settings.create(:item, name: 'foo', repository_id: nil)
 
-      settings.item.name.should == 'foo'
-      settings.item.repository_id.should == 44
+      expect(settings.item.name).to eq('foo')
+      expect(settings.item.repository_id).to eq(44)
     end
   end
 
@@ -90,19 +90,19 @@ describe Travis::Settings do
     it 'updates an existing model' do
       settings.load(item: { name: 'foo' })
 
-      settings.item.name.should == 'foo'
+      expect(settings.item.name).to eq('foo')
 
       settings.update(:item, name: 'bar')
 
-      settings.item.name.should == 'bar'
+      expect(settings.item.name).to eq('bar')
     end
 
     it 'creates a model if it does not exist yet' do
-      settings.item.should be_nil
+      expect(settings.item).to be_nil
 
       settings.update(:item, name: 'foo')
 
-      settings.item.name.should == 'foo'
+      expect(settings.item.name).to eq('foo')
     end
   end
 
@@ -118,14 +118,14 @@ describe Travis::Settings do
       settings = settings_class.new
       settings.load(item: { name: 'foo' })
 
-      settings.item.name.should == 'foo'
+      expect(settings.item.name).to eq('foo')
 
       item = settings.item
 
       result = settings.delete(:item)
 
-      settings.item.should be_nil
-      result.should == item
+      expect(settings.item).to be_nil
+      expect(result).to eq(item)
     end
   end
 
@@ -151,11 +151,11 @@ describe Travis::Settings do
                       secret: Travis::Settings::EncryptedValue.new('baz'),
                       plain: 'yup' })
 
-      settings.items.first.name.should == 'foo'
-      settings.item.name.should == 'bar'
-      settings.secret.decrypt.should == 'baz'
+      expect(settings.items.first.name).to eq('foo')
+      expect(settings.item.name).to eq('bar')
+      expect(settings.secret.decrypt).to eq('baz')
 
-      settings.simple_attributes.should == { plain: 'yup' }
+      expect(settings.simple_attributes).to eq({ plain: 'yup' })
     end
   end
 
@@ -181,8 +181,8 @@ describe Travis::Settings do
       }
       settings = settings_class.new
 
-      settings.items.to_a.should == []
-      settings.items.class.should == Travis::Settings::Items
+      expect(settings.items.to_a).to eq([])
+      expect(settings.items.class).to eq(Travis::Settings::Items)
     end
 
     it 'populates registered collections from raw settings' do
@@ -191,7 +191,7 @@ describe Travis::Settings do
       }
 
       settings = settings_class.new items: [{ name: 'one' }, { name: 'two' }]
-      settings.items.map(&:name).should == ['one', 'two']
+      expect(settings.items.map(&:name)).to eq(['one', 'two'])
     end
   end
 
@@ -206,16 +206,16 @@ describe Travis::Settings do
       settings = Travis::Settings.new('foo' => 'bar').on_save { on_save_performed = true }
       settings.save
 
-      on_save_performed.should be_true
+      expect(on_save_performed).to be_truthy
     end
 
     it 'does not run on_save callback if settings are not valid' do
       on_save_performed = false
       settings = Travis::Settings.new.on_save { on_save_performed = true }
       settings.stubs(:valid?).returns(false)
-      settings.save.should be_false
+      expect(settings.save).to be_falsey
 
-      on_save_performed.should be_false
+      expect(on_save_performed).to be_falsey
     end
   end
 
@@ -245,17 +245,17 @@ describe Travis::Settings do
 
       column = Travis::Model::EncryptedColumn.new(use_prefix: false)
 
-      hash[:secret].should_not == '44'
-      column.load(hash[:secret]).should == '44'
+      expect(hash[:secret]).not_to eq('44')
+      expect(column.load(hash[:secret])).to eq('44')
 
-      hash[:first_setting].should == 'a value'
-      hash[:second_setting].should == 'second setting default'
+      expect(hash[:first_setting]).to eq('a value')
+      expect(hash[:second_setting]).to eq('second setting default')
 
       hash_item = hash[:items].first
-      hash_item[:id].should == item.id
-      hash_item[:name].should == 'foo'
-      hash_item[:content].should_not == 'bar'
-      column.load(hash_item[:content]).should == 'bar'
+      expect(hash_item[:id]).to eq(item.id)
+      expect(hash_item[:name]).to eq('foo')
+      expect(hash_item[:content]).not_to eq('bar')
+      expect(column.load(hash_item[:content])).to eq('bar')
     end
   end
 
@@ -276,19 +276,19 @@ describe Travis::Settings do
         attribute :foo, String
       }
       settings = settings_class.new(foo: 'bar')
-      settings.foo.should == 'bar'
+      expect(settings.foo).to eq('bar')
 
       settings.merge('foo' => 'baz', items: [{ name: 'something' }])
 
-      settings.to_hash[:foo].should == 'baz'
-      settings.to_hash[:items].should == []
+      expect(settings.to_hash[:foo]).to eq('baz')
+      expect(settings.to_hash[:items]).to eq([])
      end
 
     it 'does not allow to merge unknown settings' do
       settings = Travis::Settings.new
       settings.merge('possibly_unknown_setting' => 'foo')
 
-      settings.to_hash['possibly_unknown_setting'].should be_nil
+      expect(settings.to_hash['possibly_unknown_setting']).to be_nil
     end
   end
 end

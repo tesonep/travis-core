@@ -82,25 +82,25 @@ describe Travis::Addons::Webhook::EventHandler do
     it 'returns an array of urls when given a string' do
       webhooks = 'http://evome.fr/notifications'
       build.stubs(:config => { :notifications => { :webhooks => webhooks } })
-      handler.targets.should == [webhooks]
+      expect(handler.targets).to eq([webhooks])
     end
 
     it 'returns an array of urls when given an array' do
       webhooks = %w(http://evome.fr/notifications http://example.com)
       build.stubs(:config => { :notifications => { :webhooks => webhooks } })
-      handler.targets.should == webhooks
+      expect(handler.targets).to eq(webhooks)
     end
 
     it 'returns an array of multiple urls when given a comma separated string' do
       webhooks = 'http://evome.fr/notifications, http://example.com'
       build.stubs(:config => { :notifications => { :webhooks => webhooks } })
-      handler.targets.should == webhooks.split(',').map(&:strip)
+      expect(handler.targets).to eq(webhooks.split(',').map(&:strip))
     end
 
     it 'returns an array of values if the build configuration specifies an array of urls within a config hash' do
       webhooks = { :urls => %w(http://evome.fr/notifications http://example.com), :on_success => 'change' }
       build.stubs(:config => { :notifications => { :webhooks => webhooks } })
-      handler.targets.should == webhooks[:urls]
+      expect(handler.targets).to eq(webhooks[:urls])
     end
   end
 

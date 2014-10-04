@@ -26,16 +26,16 @@ describe Travis::Services::ResetModel do
     it 'has message: all cool' do
       user.permissions.create!(repository_id: job.repository_id, pull: true)
       service.run
-      service.messages.should == [{ notice: 'The job was successfully restarted.' }]
+      expect(service.messages).to eq([{ notice: 'The job was successfully restarted.' }])
     end
 
     it 'has message: missing permissions and can not be enqueued' do
       job.stubs(:resetable?).returns(false)
       service.run
-      service.messages.should == [
+      expect(service.messages).to eq([
         { error: 'You do not seem to have sufficient permissions.' },
         { error: 'This job currently can not be restarted.' }
-      ]
+      ])
     end
   end
 
@@ -81,7 +81,7 @@ describe Travis::Services::ResetModel do
 
       it 'publishes a event' do
         service.run
-        event.should publish_instrumentation_event(
+        expect(event).to publish_instrumentation_event(
           event: 'travis.services.reset_model.run:completed',
           message: "Travis::Services::ResetModel#run:completed build_id=#{build.id} not accepted",
           data: {

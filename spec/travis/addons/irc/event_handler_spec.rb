@@ -81,25 +81,25 @@ describe Travis::Addons::Irc::EventHandler do
     it 'returns an array of urls when given a string' do
       channels = 'irc.freenode.net#travis, irc.freenode.net#rails'
       build.stubs(:config => { :notifications => { :irc => channels } })
-      handler.channels.should == ['irc.freenode.net#travis', 'irc.freenode.net#rails']
+      expect(handler.channels).to eq(['irc.freenode.net#travis', 'irc.freenode.net#rails'])
     end
 
     it 'returns an array of urls when given an array' do
       channels = ['irc.freenode.net#travis', 'irc.freenode.net#rails']
       build.stubs(:config => { :notifications => { :irc => channels } })
-      handler.channels.should == ['irc.freenode.net#travis', 'irc.freenode.net#rails']
+      expect(handler.channels).to eq(['irc.freenode.net#travis', 'irc.freenode.net#rails'])
     end
 
     it 'returns an array of urls when given a string on the channels key' do
       channels = 'irc.freenode.net#travis, irc.freenode.net#rails'
       build.stubs(:config => { :notifications => { :irc => { :channels => channels } } })
-      handler.channels.should == ['irc.freenode.net#travis', 'irc.freenode.net#rails']
+      expect(handler.channels).to eq(['irc.freenode.net#travis', 'irc.freenode.net#rails'])
     end
 
     it 'returns an array of urls when given an array on the channels key' do
       channels = ['irc.freenode.net#travis', 'irc.freenode.net#rails']
       build.stubs(:config => { :notifications => { :irc => { :channels => channels } } })
-      handler.channels.should == ['irc.freenode.net#travis', 'irc.freenode.net#rails']
+      expect(handler.channels).to eq(['irc.freenode.net#travis', 'irc.freenode.net#rails'])
     end
   end
 

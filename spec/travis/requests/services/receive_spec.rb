@@ -48,17 +48,17 @@ describe Travis::Requests::Services::Receive do
     end
 
     it 'sets the payload to the request' do
-      request.payload.should == payload
+      expect(request.payload).to eq(payload)
     end
   end
 
   shared_examples_for 'sets the owner for the request and repository to the expected type and login' do |type, login|
     it 'sets the repository owner' do
-      request.repository.owner.should be_a(type.camelize.constantize)
+      expect(request.repository.owner).to be_a(type.camelize.constantize)
     end
 
     it 'sets the request owner' do
-      request.owner.should be_a(type.camelize.constantize)
+      expect(request.owner).to be_a(type.camelize.constantize)
     end
 
     it_should_behave_like 'has the expected login for the request and repository owner', login
@@ -66,11 +66,11 @@ describe Travis::Requests::Services::Receive do
 
   shared_examples_for 'has the expected login for the request and repository owner' do |login|
     it 'has the repository owner login' do
-      request.repository.owner.login.should == login
+      expect(request.repository.owner.login).to eq(login)
     end
 
     it 'has the request owner login' do
-      request.owner.login.should == login
+      expect(request.owner.login).to eq(login)
     end
   end
 
@@ -185,7 +185,7 @@ describe Travis::Requests::Services::Receive do
         it_should_behave_like 'does not create an organization'
 
         it 'sets the comments_url to the request' do
-          request.comments_url.should == 'https://api.github.com/repos/travis-repos/test-project-1/issues/1/comments'
+          expect(request.comments_url).to eq('https://api.github.com/repos/travis-repos/test-project-1/issues/1/comments')
         end
       end
 
@@ -195,7 +195,7 @@ describe Travis::Requests::Services::Receive do
         it_should_behave_like 'creates an object from the github api', type, login, github_id
 
         it 'sets the comments_url to the request' do
-          request.comments_url.should == 'https://api.github.com/repos/travis-repos/test-project-1/issues/1/comments'
+          expect(request.comments_url).to eq('https://api.github.com/repos/travis-repos/test-project-1/issues/1/comments')
         end
       end
     end
@@ -218,7 +218,7 @@ describe Travis::Requests::Services::Receive::Instrument do
   end
 
   it 'publishes a event' do
-    event.should publish_instrumentation_event(
+    expect(event).to publish_instrumentation_event(
       event: 'travis.requests.services.receive.run:completed',
       message: 'Travis::Requests::Services::Receive#run:completed type="push"',
       data: {

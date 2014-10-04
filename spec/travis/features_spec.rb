@@ -33,7 +33,7 @@ describe Travis::Features do
     end
 
     it "should return false if the repository's owner isn't activated" do
-      Travis::Features.active?(:feature, repository).should == false
+      expect(Travis::Features.active?(:feature, repository)).to eq(false)
     end
 
     it "should allow enabling the repository" do
@@ -56,19 +56,19 @@ describe Travis::Features do
     describe "for users" do
       it "should be active when enabled for a user" do
         Travis::Features.activate_user(:feature, user)
-        Travis::Features.user_active?(:feature, user).should == true
+        expect(Travis::Features.user_active?(:feature, user)).to eq(true)
       end
 
       it "shouldn't be active when disable for a user" do
         Travis::Features.deactivate_user(:feature, user)
-        Travis::Features.user_active?(:feature, user).should == false
+        expect(Travis::Features.user_active?(:feature, user)).to eq(false)
       end
     end
 
     describe "for features" do
       it "should allow enabling features completely" do
         Travis::Features.enable_for_all(:feature)
-        Travis::Features.active?(:feature, repository).should == true
+        expect(Travis::Features.active?(:feature, repository)).to eq(true)
       end
 
       it "shouldn't be active when the feature was disabled completely" do
@@ -84,19 +84,19 @@ describe Travis::Features do
     describe "for owners" do
       it "allows enabling features for an owner" do
         Travis::Features.activate_owner(:feature, repository.owner)
-        Travis::Features.owner_active?(:feature, repository.owner).should == true
+        expect(Travis::Features.owner_active?(:feature, repository.owner)).to eq(true)
       end
 
       it "allows disabling features for an owner" do
         Travis::Features.activate_owner(:feature, repository.owner)
-        Travis::Features.owner_active?(:feature, repository.owner).should == true
+        expect(Travis::Features.owner_active?(:feature, repository.owner)).to eq(true)
         Travis::Features.deactivate_owner(:feature, repository.owner)
-        Travis::Features.owner_active?(:feature, repository.owner).should == false
+        expect(Travis::Features.owner_active?(:feature, repository.owner)).to eq(false)
       end
 
       it "allows enabling features for an organization" do
         Travis::Features.activate_owner(:feature, organization)
-        Travis::Features.owner_active?(:feature, organization).should == true
+        expect(Travis::Features.owner_active?(:feature, organization)).to eq(true)
       end
     end
   end

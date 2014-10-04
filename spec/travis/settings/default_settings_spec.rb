@@ -12,7 +12,7 @@ describe Travis::DefaultSettings do
   end
   describe 'getting properties' do
     it 'fetches a given path from default settings' do
-      settings.foo.should == 'bar'
+      expect(settings.foo).to eq('bar')
     end
   end
 

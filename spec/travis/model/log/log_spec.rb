@@ -10,15 +10,15 @@ describe Log do
   describe 'class methods' do
     it 'is archived only when archive is verified' do
       log.archived_at = Time.now
-      log.should_not be_archived
+      expect(log).not_to be_archived
       log.archive_verified = true
-      log.should be_archived
+      expect(log).to be_archived
     end
 
     describe '#to_json' do
       it 'returns JSON representation of the record' do
         json = JSON.parse(job.log.to_json)
-        json['log']['id'].should == job.log.id
+        expect(json['log']['id']).to eq(job.log.id)
       end
     end
   end
@@ -26,18 +26,18 @@ describe Log do
   describe 'content' do
     it 'while not aggregated it returns the aggregated parts' do
       lines.each_with_index { |line, ix| Log::Part.create!(log_id: log.id, content: line, number: ix) }
-      log.content.should == lines.join
+      expect(log.content).to eq(lines.join)
     end
 
     it 'while not aggregated it appends to an existing log' do
       job.log.update_attributes(content: 'foo')
       Log::Part.create!(log_id: log.id, content: 'bar')
-      log.content.should == 'foobar'
+      expect(log.content).to eq('foobar')
     end
 
     it 'if aggregated returns the aggregated parts' do
       log.update_attributes!(content: 'content', aggregated_at: Time.now)
-      log.content.should == 'content'
+      expect(log.content).to eq('content')
     end
   end
 
@@ -54,25 +54,25 @@ describe Log do
     it 'resets content' do
       log.update_attributes!(content: 'foo')
       log.clear!
-      log.reload.content.should == ''
+      expect(log.reload.content).to eq('')
     end
 
     it 'resets aggregated_at' do
       log.update_attributes!(aggregated_at: Time.now)
       log.clear!
-      log.reload.aggregated_at.should be_nil
+      expect(log.reload.aggregated_at).to be_nil
     end
 
     it 'resets archived_at' do
       log.update_attributes!(archived_at: Time.now)
       log.clear!
-      log.reload.archived_at.should be_nil
+      expect(log.reload.archived_at).to be_nil
     end
 
     it 'resets archive_verified' do
       log.update_attributes!(archive_verified: true)
       log.clear!
-      log.reload.archive_verified.should be_nil
+      expect(log.reload.archive_verified).to be_nil
     end
   end
 end

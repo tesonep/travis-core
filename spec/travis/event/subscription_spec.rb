@@ -29,7 +29,7 @@ describe Travis::Event::Subscription do
 
     it "should notify when the event matches" do
       subscription.notify('build:finished')
-      subscription.subscriber.events.should have(1).item
+      expect(subscription.subscriber.events.size).to eq(1)
     end
 
     it "should increment a counter when the event is triggered" do
@@ -40,7 +40,7 @@ describe Travis::Event::Subscription do
 
     it "shouldn't notify when the event doesn't match" do
       subscription.notify('build:started')
-      subscription.subscriber.events.should have(0).items
+      expect(subscription.subscriber.events.size).to eq(0)
     end
   end
 
@@ -55,7 +55,7 @@ describe Travis::Event::Subscription do
     # end
 
     it 'does not raise the exception' do
-     lambda { subscription.subscriber }.should_not raise_error
+     expect { subscription.subscriber }.not_to raise_error
     end
   end
 end

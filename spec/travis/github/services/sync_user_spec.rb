@@ -23,20 +23,20 @@ describe Travis::Github::Services::SyncUser do
 
   describe 'syncing' do
     it 'returns the block value' do
-      service.send(:syncing) { 42 }.should == 42
+      expect(service.send(:syncing) { 42 }).to eq(42)
     end
 
     it 'sets is_syncing?' do
       user.is_syncing = false
-      user.should_not be_syncing
-      service.send(:syncing) { user.should be_syncing }
-      user.should_not be_syncing
+      expect(user).not_to be_syncing
+      service.send(:syncing) { expect(user).to be_syncing }
+      expect(user).not_to be_syncing
     end
 
     it 'sets synced_at' do
       time = Time.now
       service.send(:syncing) { }
-      user.synced_at.should >= time
+      expect(user.synced_at).to be >= time
     end
 
     it 'raises exceptions' do
@@ -46,7 +46,7 @@ describe Travis::Github::Services::SyncUser do
 
     it 'ensures the user is set back to not sycing when an exception raises' do
       service.send(:syncing) { raise('kaputt') } rescue nil
-      user.should_not be_syncing
+      expect(user).not_to be_syncing
     end
   end
 

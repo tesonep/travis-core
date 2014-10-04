@@ -82,13 +82,13 @@ describe Travis::Addons::Email::EventHandler do
       it 'equals the recipients specified in the build configuration if any (given as an array)' do
         recipients = %w(recipient-1@email.com)
         build.stubs(config: { notifications: { recipients: recipients } })
-        handler.recipients.should contain_recipients(recipients)
+        expect(handler.recipients).to contain_recipients(recipients)
       end
 
       it 'equals the recipients specified in the build configuration if any (given as a string)' do
         recipients = 'recipient-1@email.com'
         build.stubs(config: { notifications: { recipients: recipients } })
-        handler.recipients.should contain_recipients(recipients)
+        expect(handler.recipients).to contain_recipients(recipients)
       end
 
     end
@@ -104,12 +104,12 @@ describe Travis::Addons::Email::EventHandler do
       }
 
       it 'contains the author emails if the build has them set' do
-        handler.recipients.should contain_recipients(build.commit.author_email)
+        expect(handler.recipients).to contain_recipients(build.commit.author_email)
       end
 
       it 'contains the committer emails if the build has them set' do
         build.commit.stubs(committer_email: 'committer-1@email.com')
-        handler.recipients.should contain_recipients(build.commit.committer_email)
+        expect(handler.recipients).to contain_recipients(build.commit.committer_email)
       end
     end
 

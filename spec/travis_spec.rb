@@ -9,8 +9,8 @@ describe Travis do
     it "should connect to localhost by default" do
       Travis.start
       client = Travis.redis.client
-      client.host.should == 'localhost'
-      client.port.should == 6379
+      expect(client.host).to eq('localhost')
+      expect(client.port).to eq(6379)
     end
 
     describe "with Travis.config" do

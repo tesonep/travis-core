@@ -25,35 +25,74 @@ describe Travis::Github::Services::SyncUser::UserInfo do
   let(:user) { stub('user', old_user_info) }
   subject { described_class.new(user, gh) }
 
-  its(:name)            { should == 'Konstantin Haase' }
-  its(:gravatar_id)     { should == '5c2b452f6eea4a6d84c105ebd971d2a4' }
-  its(:login)           { should == 'rkh' }
-  its(:email)           { should == 'konstantin.haase@gmail.com' }
-  its(:verified_emails) { should == [
+  describe '#name' do
+    subject { super().name }
+    it { is_expected.to eq('Konstantin Haase') }
+  end
+
+  describe '#gravatar_id' do
+    subject { super().gravatar_id }
+    it { is_expected.to eq('5c2b452f6eea4a6d84c105ebd971d2a4') }
+  end
+
+  describe '#login' do
+    subject { super().login }
+    it { is_expected.to eq('rkh') }
+  end
+
+  describe '#email' do
+    subject { super().email }
+    it { is_expected.to eq('konstantin.haase@gmail.com') }
+  end
+
+  describe '#verified_emails' do
+    subject { super().verified_emails }
+    it { is_expected.to eq([
     "konstantin.mailinglists@gmail.com",
     "konstantin.mailinglists@googlemail.com"
-  ]}
+  ])}
+  end
 
   describe 'no public email' do
     before { user_info.delete 'email' }
-    its(:email) { should == 'konstantin.mailinglists@googlemail.com' }
+
+    describe '#email' do
+      subject { super().email }
+      it { is_expected.to eq('konstantin.mailinglists@googlemail.com') }
+    end
 
     describe 'missing github scope' do
       before { old_user_info['github_scopes'] = [] }
-      its(:email) { should == 'konstantin.haase@gmail.com' }
+
+      describe '#email' do
+        subject { super().email }
+        it { is_expected.to eq('konstantin.haase@gmail.com') }
+      end
     end
 
     describe 'no primary email' do
       before { emails.delete_if { |e| e["primary"] }}
-      its(:email) { should == 'konstantin.mailinglists@gmail.com' }
+
+      describe '#email' do
+        subject { super().email }
+        it { is_expected.to eq('konstantin.mailinglists@gmail.com') }
+      end
 
       describe 'no verified email' do
         before { emails.delete_if { |e| e["verified"] }}
-        its(:email) { should == 'konstantin.haase@gmail.com' }
+
+        describe '#email' do
+          subject { super().email }
+          it { is_expected.to eq('konstantin.haase@gmail.com') }
+        end
 
         describe 'no email on file' do
           before { old_user_info['email'] = nil }
-          its(:email) { should == 'konstantin@Konstantins-MacBook-Air.local' }
+
+          describe '#email' do
+            subject { super().email }
+            it { is_expected.to eq('konstantin@Konstantins-MacBook-Air.local') }
+          end
         end
       end
     end
@@ -61,12 +100,20 @@ describe Travis::Github::Services::SyncUser::UserInfo do
 
   describe 'login changed' do
     before { user_info['login'] = 'RKH' }
-    its(:login) { should == 'RKH' }
+
+    describe '#login' do
+      subject { super().login }
+      it { is_expected.to eq('RKH') }
+    end
   end
 
   describe 'name changed' do
     before { user_info['name'] = 'RKH' }
-    its(:name) { should == 'RKH' }
+
+    describe '#name' do
+      subject { super().name }
+      it { is_expected.to eq('RKH') }
+    end
   end
 
   it 'calls update_attributes! and emails.find_or_create_by_email!' do

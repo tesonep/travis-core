@@ -11,12 +11,12 @@ describe Travis::Github::Services::SyncUser::Repository do
 
     it 'creates a new repository per record if not yet present' do
       run.call
-      Repository.find_by_github_id(100).should be_present
+      expect(Repository.find_by_github_id(100)).to be_present
     end
 
     it 'does not create a new repository' do
       Repository.create!(:owner_name => 'sven-1', :name => 'minimal-2', :github_id => 100)
-      run.should_not change(Repository, :count)
+      expect(run).not_to change(Repository, :count)
     end
   end
 
@@ -24,10 +24,10 @@ describe Travis::Github::Services::SyncUser::Repository do
     let(:repo) { { 'id' => 100, 'name' => 'minimal', 'owner' => { 'login' => 'sven' }, 'permissions' => { 'admin' => false, 'push' => false, 'pull' => true } } }
     it "updates repositorie's name and owner name" do
       r = Repository.create!(:owner_name => 'sven-1', :name => 'minimal-2', :github_id => 100)
-      run.should change { r.reload.owner_name }
+      expect(run).to change { r.reload.owner_name }
 
-      r.owner_name.should == 'sven'
-      r.name.should == 'minimal'
+      expect(r.owner_name).to eq('sven')
+      expect(r.name).to eq('minimal')
     end
   end
 
@@ -36,13 +36,13 @@ describe Travis::Github::Services::SyncUser::Repository do
       let(:repo) { { 'name' => 'minimal', 'owner' => { 'login' => 'sven' }, 'permissions' => { 'admin' => false, 'push' => false, 'pull' => true } } }
 
       it "doesn't create a new permission for the user/repo" do
-        run.should_not change(Permission, :count)
+        expect(run).not_to change(Permission, :count)
       end
 
       it "destroys an existing permission" do
         repo = Repository.create(:owner_name => 'sven', :name => 'minimal')
         repo.permissions.create(:user => user, :push => true, :pull => true)
-        run.should change(Permission, :count).by(-1)
+        expect(run).to change(Permission, :count).by(-1)
       end
     end
 
@@ -50,19 +50,19 @@ describe Travis::Github::Services::SyncUser::Repository do
       let(:repo) { { 'name' => 'minimal', 'owner' => { 'login' => 'sven' }, 'permissions' => { 'admin' => false, 'push' => true, 'pull' => true } } }
 
       it "creates a new permission for the user/repo" do
-        run.should change(Permission, :count).by(1)
+        expect(run).to change(Permission, :count).by(1)
       end
 
       it "updates an existing permission" do
         repo = Repository.create(:owner_name => 'sven', :name => 'minimal')
         repo.permissions.create(:user => user, :admin => true, :push => true, :pull => true)
 
-        run.should_not change(Permission, :count)
+        expect(run).not_to change(Permission, :count)
 
         permission = Permission.first
-        permission.admin.should == false
-        permission.push.should == true
-        permission.pull.should == true
+        expect(permission.admin).to eq(false)
+        expect(permission.push).to eq(true)
+        expect(permission.pull).to eq(true)
       end
     end
 
@@ -70,19 +70,19 @@ describe Travis::Github::Services::SyncUser::Repository do
       let(:repo) { { 'name' => 'minimal', 'owner' => { 'login' => 'sven' }, 'permissions' => { 'admin' => true, 'push' => true, 'pull' => true } } }
 
       it "creates a new permission for the user/repo" do
-        run.should change(Permission, :count).by(1)
+        expect(run).to change(Permission, :count).by(1)
       end
 
       it "updates an existing permission" do
         repo = Repository.create(:owner_name => 'sven', :name => 'minimal')
         repo.permissions.create(:user => user, :push => true, :pull => true)
 
-        run.should_not change(Permission, :count)
+        expect(run).not_to change(Permission, :count)
 
         permission = Permission.first
-        permission.admin.should == true
-        permission.push.should == true
-        permission.pull.should == true
+        expect(permission.admin).to eq(true)
+        expect(permission.push).to eq(true)
+        expect(permission.pull).to eq(true)
       end
     end
   end
@@ -92,19 +92,19 @@ describe Travis::Github::Services::SyncUser::Repository do
       let(:repo) { { 'name' => 'minimal', 'owner' => { 'login' => 'sven' }, 'private' => true, 'permissions' => { 'admin' => false, 'push' => false, 'pull' => true } } }
 
       it "creates a new permission for the user/repo" do
-        run.should change(Permission, :count)
+        expect(run).to change(Permission, :count)
       end
 
       it "updates an existing permission" do
         repo = Repository.create(:owner_name => 'sven', :name => 'minimal')
         repo.permissions.create(:user => user, :admin => true, :push => true, :pull => true)
 
-        run.should_not change(Permission, :count)
+        expect(run).not_to change(Permission, :count)
 
         permission = Permission.first
-        permission.admin.should == false
-        permission.push.should == false
-        permission.pull.should == true
+        expect(permission.admin).to eq(false)
+        expect(permission.push).to eq(false)
+        expect(permission.pull).to eq(true)
       end
     end
 
@@ -112,19 +112,19 @@ describe Travis::Github::Services::SyncUser::Repository do
       let(:repo) { { 'name' => 'minimal', 'owner' => { 'login' => 'sven' }, 'private' => true, 'permissions' => { 'admin' => false, 'push' => true, 'pull' => true } } }
 
       it "creates a new permission for the user/repo" do
-        run.should change(Permission, :count).by(1)
+        expect(run).to change(Permission, :count).by(1)
       end
 
       it "updates an existing permission" do
         repo = Repository.create(:owner_name => 'sven', :name => 'minimal')
         repo.permissions.create(:user => user, :admin => true, :push => true, :pull => true)
 
-        run.should_not change(Permission, :count)
+        expect(run).not_to change(Permission, :count)
 
         permission = Permission.first
-        permission.admin.should == false
-        permission.push.should == true
-        permission.pull.should == true
+        expect(permission.admin).to eq(false)
+        expect(permission.push).to eq(true)
+        expect(permission.pull).to eq(true)
       end
     end
 
@@ -132,19 +132,19 @@ describe Travis::Github::Services::SyncUser::Repository do
       let(:repo) { { 'name' => 'minimal', 'owner' => { 'login' => 'sven' }, 'private' => true, 'permissions' => { 'admin' => true, 'push' => true, 'pull' => true } } }
 
       it "creates a new permission for the user/repo" do
-        run.should change(Permission, :count).by(1)
+        expect(run).to change(Permission, :count).by(1)
       end
 
       it "updates an existing permission" do
         repo = Repository.create(:owner_name => 'sven', :name => 'minimal')
         repo.permissions.create(:user => user, :push => true, :pull => true)
 
-        run.should_not change(Permission, :count)
+        expect(run).not_to change(Permission, :count)
 
         permission = Permission.first
-        permission.admin.should == true
-        permission.push.should == true
-        permission.pull.should == true
+        expect(permission.admin).to eq(true)
+        expect(permission.push).to eq(true)
+        expect(permission.pull).to eq(true)
       end
     end
   end

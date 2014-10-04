@@ -19,39 +19,39 @@ describe Travis::Addons::GithubStatus::Instruments::EventHandler do
     build.request.stubs(:pull_request?).returns(false)
     subject.notify('build:finished', build)
 
-    event.should publish_instrumentation_event(
+    expect(event).to publish_instrumentation_event(
       event: 'travis.addons.github_status.event_handler.notify:completed',
       message: 'Travis::Addons::GithubStatus::EventHandler#notify:completed (build:finished) for #<Build id=1>',
     )
 
-    event[:data].except(:payload).should == {
+    expect(event[:data].except(:payload)).to eq({
       repository: 'svenfuchs/minimal',
       request_id: 1,
       object_id: 1,
       object_type: 'Build',
       event: 'build:finished'
-    }
+    })
 
-    event[:data][:payload].should_not be_nil
+    expect(event[:data][:payload]).not_to be_nil
   end
 
   it 'publishes a event for pull request events' do
     build.request.stubs(:pull_request?).returns(true)
     subject.notify('build:finished', build)
 
-    event.should publish_instrumentation_event(
+    expect(event).to publish_instrumentation_event(
       event: 'travis.addons.github_status.event_handler.notify:completed',
       message: 'Travis::Addons::GithubStatus::EventHandler#notify:completed (build:finished) for #<Build id=1>',
     )
 
-    event[:data].except(:payload).should == {
+    expect(event[:data].except(:payload)).to eq({
       repository: 'svenfuchs/minimal',
       request_id: 1,
       object_id: 1,
       object_type: 'Build',
       event: 'build:finished'
-    }
+    })
 
-    event[:data][:payload].should_not be_nil
+    expect(event[:data][:payload]).not_to be_nil
   end
 end

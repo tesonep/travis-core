@@ -33,8 +33,8 @@ describe Travis::Services::CancelBuild do
         }.to change { build.reload.state }
       }.to change { job.reload.state }
 
-      job.state.should == 'canceled'
-      build.state.should == 'canceled'
+      expect(job.state).to eq('canceled')
+      expect(build.state).to eq('canceled')
     end
 
     it 'should not cancel the job if it\'s not cancelable' do
@@ -48,7 +48,7 @@ describe Travis::Services::CancelBuild do
     it 'should not be able to cancel job if user does not have any permissions' do
       user.permissions.destroy_all
 
-      service.can_cancel?.should be_false
+      expect(service.can_cancel?).to be_falsey
     end
   end
 end

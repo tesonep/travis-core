@@ -14,11 +14,11 @@ describe Repository do
     end
 
     it 'returns last completed build' do
-      repo.last_completed_build.should == build2
+      expect(repo.last_completed_build).to eq(build2)
     end
 
     it 'returns last completed build for a branch' do
-      repo.last_completed_build('master').should == build1
+      expect(repo.last_completed_build('master')).to eq(build1)
     end
   end
 
@@ -37,12 +37,12 @@ describe Repository do
 
       it 'can be a user' do
         repo = Factory(:repository, owner: user)
-        repo.reload.owner.should == user
+        expect(repo.reload.owner).to eq(user)
       end
 
       it 'can be an organization' do
         repo = Factory(:repository, owner: org)
-        repo.reload.owner.should == org
+        expect(repo.reload.owner).to eq(org)
       end
     end
   end
@@ -52,21 +52,21 @@ describe Repository do
       let(:minimal) { Factory(:repository) }
 
       it "should find a repository by it's github_id" do
-        Repository.find_by(github_id: minimal.github_id).should == minimal
+        expect(Repository.find_by(github_id: minimal.github_id)).to eq(minimal)
       end
 
       it "should find a repository by it's id" do
-        Repository.find_by(id: minimal.id).id.should == minimal.id
+        expect(Repository.find_by(id: minimal.id).id).to eq(minimal.id)
       end
 
       it "should find a repository by it's name and owner_name" do
         repo = Repository.find_by(name: minimal.name, owner_name: minimal.owner_name)
-        repo.owner_name.should == minimal.owner_name
-        repo.name.should == minimal.name
+        expect(repo.owner_name).to eq(minimal.owner_name)
+        expect(repo.name).to eq(minimal.name)
       end
 
       it "returns nil when a repository couldn't be found using params" do
-        Repository.find_by(name: 'emptiness').should be_nil
+        expect(Repository.find_by(name: 'emptiness')).to be_nil
       end
     end
 
@@ -76,8 +76,8 @@ describe Repository do
         two   = Factory(:repository, name: 'two',   last_build_started_at: '2011-11-12')
 
         repositories = Repository.timeline.all
-        repositories.first.id.should == two.id
-        repositories.last.id.should  == one.id
+        expect(repositories.first.id).to eq(two.id)
+        expect(repositories.last.id).to  eq(one.id)
       end
     end
 
@@ -89,7 +89,7 @@ describe Repository do
         three = Factory(:repository, name: 'three', last_build_started_at: nil, last_build_id: 100)
 
         repositories = Repository.with_builds.all
-        repositories.map(&:id).sort.should == [two, three].map(&:id).sort
+        expect(repositories.map(&:id).sort).to eq([two, three].map(&:id).sort)
       end
     end
 
@@ -98,11 +98,11 @@ describe Repository do
       let(:inactive) { Factory(:repository, active: false) }
 
       it 'contains active repositories' do
-        Repository.active.should include(active)
+        expect(Repository.active).to include(active)
       end
 
       it 'does not include inactive repositories' do
-        Repository.active.should_not include(inactive)
+        expect(Repository.active).not_to include(inactive)
       end
     end
 
@@ -113,15 +113,15 @@ describe Repository do
       end
 
       it 'performs searches case-insensitive' do
-        Repository.search('rEpO').to_a.count.should == 2
+        expect(Repository.search('rEpO').to_a.count).to eq(2)
       end
 
       it 'performs searches with / entered' do
-        Repository.search('fuchs/').to_a.count.should == 2
+        expect(Repository.search('fuchs/').to_a.count).to eq(2)
       end
 
       it 'performs searches with \ entered' do
-        Repository.search('fuchs\\').to_a.count.should == 2
+        expect(Repository.search('fuchs\\').to_a.count).to eq(2)
       end
     end
 
@@ -137,7 +137,7 @@ describe Repository do
       end
 
       it 'returns all repositories a user has rights to' do
-        Repository.by_member('svenfuchs').should have(2).items
+        expect(Repository.by_member('svenfuchs').size).to eq(2)
       end
     end
 
@@ -149,7 +149,7 @@ describe Repository do
 
       it 'returns repository counts per owner_name for the given owner_names' do
         counts = Repository.counts_by_owner_names(%w(svenfuchs travis-ci))
-        counts.should == { 'svenfuchs' => 1, 'travis-ci' => 1 }
+        expect(counts).to eq({ 'svenfuchs' => 1, 'travis-ci' => 1 })
       end
     end
   end
@@ -162,7 +162,7 @@ describe Repository do
     end
 
     it 'returns the api url for the repository' do
-      repo.api_url.should == 'https://api.github.com/repos/travis-ci/travis-ci'
+      expect(repo.api_url).to eq('https://api.github.com/repos/travis-ci/travis-ci')
     end
   end
 
@@ -171,12 +171,12 @@ describe Repository do
 
     it 'returns the public git source url for a public repository' do
       repo.private = false
-      repo.source_url.should == 'git://github.com/travis-ci/travis-ci.git'
+      expect(repo.source_url).to eq('git://github.com/travis-ci/travis-ci.git')
     end
 
     it 'returns the private git source url for a private repository' do
       repo.private = true
-      repo.source_url.should == 'git@github.com:travis-ci/travis-ci.git'
+      expect(repo.source_url).to eq('git@github.com:travis-ci/travis-ci.git')
     end
   end
 
@@ -187,19 +187,19 @@ describe Repository do
     Factory(:build, attributes)
     build = Factory(:build, attributes)
 
-    repo.last_build.id.should == build.id
+    expect(repo.last_build.id).to eq(build.id)
   end
 
   describe "keys" do
     let(:repo) { Factory(:repository) }
 
     it "should return the public key" do
-      repo.public_key.should == repo.key.public_key
+      expect(repo.public_key).to eq(repo.key.public_key)
     end
 
     it "should create a new key when the repository is created" do
       repo = Repository.create!(owner_name: 'travis-ci', name: 'travis-ci')
-      repo.key.should_not be_nil
+      expect(repo.key).not_to be_nil
     end
   end
 
@@ -210,11 +210,11 @@ describe Repository do
       %w(master production).each do |branch|
         2.times { Factory(:build, repository: repo, commit: Factory(:commit, branch: branch)) }
       end
-      repo.branches.sort.should == %w(master production)
+      expect(repo.branches.sort).to eq(%w(master production))
     end
 
     it 'is empty for empty repository' do
-      repo.branches.should eql []
+      expect(repo.branches).to eql []
     end
   end
 
@@ -225,13 +225,13 @@ describe Repository do
       repo.save
 
       env_var = repo.settings.env_vars.create(name: 'FOO')
-      env_var.repository_id.should == repo.id
+      expect(env_var.repository_id).to eq(repo.id)
 
       repo.settings.save
 
       repo.reload
 
-      repo.settings.env_vars.first.repository_id.should == repo.id
+      expect(repo.settings.env_vars.first.repository_id).to eq(repo.id)
     end
 
     it "is reset on reload" do
@@ -240,37 +240,37 @@ describe Repository do
       repo.settings = {}
       repo.update_column(:settings, { 'build_pushes' => false }.to_json)
       repo.reload
-      repo.settings.build_pushes?.should be_false
+      expect(repo.settings.build_pushes?).to be_falsey
       repo.update_column(:settings, { 'build_pushes' => true }.to_json)
       repo.reload
-      repo.settings.build_pushes?.should be_true
+      expect(repo.settings.build_pushes?).to be_truthy
     end
 
     it "allows to set nil for settings" do
       repo.settings = nil
-      repo.settings.to_hash.should == Repository::Settings.new.to_hash
+      expect(repo.settings.to_hash).to eq(Repository::Settings.new.to_hash)
     end
 
     it "allows to set settings as JSON string" do
       repo.settings = '{"maximum_number_of_builds": 44}'
-      repo.settings.to_hash.should == Repository::Settings.new(maximum_number_of_builds: 44).to_hash
+      expect(repo.settings.to_hash).to eq(Repository::Settings.new(maximum_number_of_builds: 44).to_hash)
     end
 
     it "allows to set settings as a Hash" do
       repo.settings = { maximum_number_of_builds: 44}
-      repo.settings.to_hash.should == Repository::Settings.new(maximum_number_of_builds: 44).to_hash
+      expect(repo.settings.to_hash).to eq(Repository::Settings.new(maximum_number_of_builds: 44).to_hash)
     end
 
     it 'updates settings in the DB' do
       repo.settings = {'build_pushes' => false}
       repo.save
 
-      repo.reload.settings.build_pushes?.should == false
+      expect(repo.reload.settings.build_pushes?).to eq(false)
 
       repo.settings.merge('build_pushes' => true)
       repo.settings.save
 
-      repo.reload.settings.build_pushes?.should == true
+      expect(repo.reload.settings.build_pushes?).to eq(true)
     end
   end
 
@@ -283,7 +283,7 @@ describe Repository do
       two = Factory(:build, repository: repo, finished_at: 1.hours.ago, state: 'finished', commit: Factory(:commit, branch: '2two'))
 
       builds = repo.last_finished_builds_by_branches(1)
-      builds.should == [two]
+      expect(builds).to eq([two])
     end
 
     it 'retrieves last builds on all branches' do
@@ -295,10 +295,10 @@ describe Repository do
       three.update_attribute(:event_type, 'pull_request')
 
       builds = repo.last_finished_builds_by_branches
-      builds.size.should == 2
-      builds.should include(one)
-      builds.should include(two)
-      builds.should_not include(old)
+      expect(builds.size).to eq(2)
+      expect(builds).to include(one)
+      expect(builds).to include(two)
+      expect(builds).not_to include(old)
     end
   end
 
@@ -316,9 +316,9 @@ describe Repository do
       user_wrong_permission = Factory(:user)
       user_wrong_permission.permissions.create!(repository: repo, push: true)
 
-      repo.users_with_permission(:admin).should include(user_with_permission)
-      repo.users_with_permission(:admin).should_not include(user_wrong_repo)
-      repo.users_with_permission(:admin).should_not include(user_wrong_permission)
+      expect(repo.users_with_permission(:admin)).to include(user_with_permission)
+      expect(repo.users_with_permission(:admin)).not_to include(user_wrong_repo)
+      expect(repo.users_with_permission(:admin)).not_to include(user_wrong_permission)
     end
   end
 end

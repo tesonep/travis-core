@@ -11,7 +11,7 @@ describe Travis::Github::Education do
       with(headers: { 'Authorization' => 'token an-oauth-token' }).
       to_return(body: '{ "student": true }')
 
-    education.data.should == { "student" => true }
+    expect(education.data).to eq({ "student" => true })
   end
 
   it 'returns empty hash on json parse error' do
@@ -19,7 +19,7 @@ describe Travis::Github::Education do
       with(headers: { 'Authorization' => 'token an-oauth-token' }).
       to_return(body: 'not json')
 
-    education.data.should == {}
+    expect(education.data).to eq({})
   end
 
   it 'returns empty hash on error response' do
@@ -27,13 +27,13 @@ describe Travis::Github::Education do
       with(headers: { 'Authorization' => 'token an-oauth-token' }).
       to_return(body: '{}', status: 404)
 
-    education.data.should == {}
+    expect(education.data).to eq({})
   end
 
   describe 'student?' do
     it 'is true when student field is true in the response' do
       education.expects(:data).returns({ 'student' => true })
-      education.student?.should be_true
+      expect(education.student?).to be_truthy
     end
   end
 end

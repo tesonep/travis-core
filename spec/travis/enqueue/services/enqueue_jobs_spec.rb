@@ -32,7 +32,7 @@ describe Travis::Enqueue::Services::EnqueueJobs do
     describe "with a timeout" do
       it "returns false when the timeout is hit" do
         Travis::Features.stubs(:feature_deactivated?).raises(Timeout::Error)
-        service.disabled?.should == false
+        expect(service.disabled?).to eq(false)
       end
     end
   end
@@ -66,7 +66,7 @@ describe Travis::Enqueue::Services::EnqueueJobs do
 
     it 'keeps a report of enqueued jobs' do
       service.run
-      service.reports.should == { 'svenfuchs' => { total: 1, running: 0, max: 5, queueable: 1 } }
+      expect(service.reports).to eq({ 'svenfuchs' => { total: 1, running: 0, max: 5, queueable: 1 } })
     end
   end
 
@@ -83,7 +83,7 @@ describe Travis::Enqueue::Services::EnqueueJobs do
     end
 
     it 'publishes a event' do
-      event.should publish_instrumentation_event(
+      expect(event).to publish_instrumentation_event(
         event: 'travis.enqueue.services.enqueue_jobs.run:completed',
         message: "Travis::Enqueue::Services::EnqueueJobs#run:completed enqueued:\n  svenfuchs: total: 1, running: 0, max: 5, queueable: 1",
         data: {

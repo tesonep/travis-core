@@ -11,7 +11,7 @@ describe Travis::Api::V1::Http::Branches do
   end
 
   it 'data' do
-    data.should == [{
+    expect(data).to eq([{
       'repository_id' => 1,
       'build_id' => 1,
       'commit' => '62aae5f70ceee39123ef',
@@ -20,6 +20,6 @@ describe Travis::Api::V1::Http::Branches do
       'result' => 0,
       'started_at' => json_format_time(Time.now.utc - 1.minute),
       'finished_at' => json_format_time(Time.now.utc),
-    }]
+    }])
   end
 end

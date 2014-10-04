@@ -134,7 +134,7 @@ describe Travis::Github::Services::SyncUser::Repositories::Instrument do
   end
 
   it 'publishes a event on :run' do
-    events[3].should publish_instrumentation_event(
+    expect(events[3]).to publish_instrumentation_event(
       event: 'travis.github.services.sync_user.repositories.run:completed',
       message: %(Travis::Github::Services::SyncUser::Repositories#run:completed for #<User id=#{user.id} login="sven">),
       result: {
@@ -148,7 +148,7 @@ describe Travis::Github::Services::SyncUser::Repositories::Instrument do
   end
 
   it 'publishes a event on :fetch' do
-    events[2].should publish_instrumentation_event(
+    expect(events[2]).to publish_instrumentation_event(
       event: 'travis.github.services.sync_user.repositories.fetch:completed',
       message: %(Travis::Github::Services::SyncUser::Repositories#fetch:completed for #<User id=#{user.id} login="sven">),
       result: data,

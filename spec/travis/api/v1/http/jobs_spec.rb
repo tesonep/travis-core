@@ -6,14 +6,14 @@ describe Travis::Api::V1::Http::Jobs do
   let(:data) { Travis::Api::V1::Http::Jobs.new([test]).data }
 
   it 'tests' do
-    data.first.should == {
+    expect(data.first).to eq({
       'id' => test.id,
       'repository_id' => test.repository_id,
       'number' => '2.1',
       'queue' => 'builds.linux',
       'state' => 'finished',
       'allow_failure' => false
-    }
+    })
   end
 end
 

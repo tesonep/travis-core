@@ -10,26 +10,26 @@ describe Travis::Services::FindBuild do
 
   describe 'run' do
     it 'finds a build by the given id' do
-      service.run.should == build
+      expect(service.run).to eq(build)
     end
 
     it 'does not raise if the build could not be found' do
       @params = { :id => build.id + 1 }
-      lambda { service.run }.should_not raise_error
+      expect { service.run }.not_to raise_error
     end
   end
 
   describe 'updated_at' do
     it 'returns builds updated_at attribute' do
-      service.updated_at.to_s.should == build.updated_at.to_s
+      expect(service.updated_at.to_s).to eq(build.updated_at.to_s)
     end
   end
 
   describe 'with newer associated record' do
     it 'returns updated_at of newest result' do
       build.update_attribute(:updated_at, 5.minutes.ago)
-      build.reload.updated_at.should < build.matrix.first.updated_at
-      service.updated_at.to_s.should == build.matrix.first.updated_at.to_s
+      expect(build.reload.updated_at).to be < build.matrix.first.updated_at
+      expect(service.updated_at.to_s).to eq(build.matrix.first.updated_at.to_s)
     end
   end
 

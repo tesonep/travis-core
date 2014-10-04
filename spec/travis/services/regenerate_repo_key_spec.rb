@@ -15,7 +15,7 @@ describe Travis::Services::RegenerateRepoKey do
   describe 'given the request is authorized' do
     it 'regenerates the key' do
       repo.expects(:regenerate_key!)
-      service.run.should == repo.reload.key
+      expect(service.run).to eq(repo.reload.key)
     end
   end
 
@@ -23,7 +23,7 @@ describe Travis::Services::RegenerateRepoKey do
     it 'does not regenerate key' do
       user.permissions.destroy_all
       repo.expects(:regenerate_key!).never
-      service.run.should be_false
+      expect(service.run).to be_falsey
     end
   end
 end

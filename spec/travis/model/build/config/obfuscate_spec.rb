@@ -13,11 +13,11 @@ describe Build::Config::Obfuscate do
       env: [[encrypted, 'FOO=foo'], [{ ONE: 1, TWO: '2' }]]
     }
 
-    build.obfuscated_config.should == {
+    expect(build.obfuscated_config).to eq({
       language: 'ruby',
       os: 'linux',
       env: ['BAR=[secure] FOO=foo', 'ONE=1 TWO=2']
-    }
+    })
   end
 
   it 'leaves regular vars untouched' do
@@ -25,12 +25,12 @@ describe Build::Config::Obfuscate do
       rvm: ['1.8.7'], env: ['FOO=foo']
     }
 
-    build.obfuscated_config.should == {
+    expect(build.obfuscated_config).to eq({
       language: 'ruby',
       os: 'linux',
       rvm: ['1.8.7'],
       env: ['FOO=foo']
-    }
+    })
   end
 
   it 'obfuscates env vars' do
@@ -40,12 +40,12 @@ describe Build::Config::Obfuscate do
       env: [[encrypted, 'FOO=foo'], 'BAR=baz']
     }
 
-    build.obfuscated_config.should == {
+    expect(build.obfuscated_config).to eq({
       language: 'ruby',
       os: 'linux',
       rvm: ['1.8.7'],
       env: ['BAR=[secure] FOO=foo', 'BAR=baz']
-    }
+    })
   end
 
   it 'obfuscates env vars which are not in nested array' do
@@ -54,12 +54,12 @@ describe Build::Config::Obfuscate do
       env: [build.repository.key.secure.encrypt('BAR=barbaz')]
     }
 
-    build.obfuscated_config.should == {
+    expect(build.obfuscated_config).to eq({
       language: 'ruby',
       os: 'linux',
       rvm: ['1.8.7'],
       env: ['BAR=[secure]']
-    }
+    })
   end
 
   it 'works with nil values' do
@@ -67,12 +67,12 @@ describe Build::Config::Obfuscate do
       rvm: ['1.8.7'],
       env: [[nil, { secure: '' }]]
     }
-    build.obfuscated_config.should == {
+    expect(build.obfuscated_config).to eq({
       language: 'ruby',
       os: 'linux',
       rvm: ['1.8.7'],
       env:  ['']
-    }
+    })
   end
 
   it 'does not make an empty env key an array but leaves it empty' do
@@ -80,12 +80,12 @@ describe Build::Config::Obfuscate do
       rvm: ['1.8.7'],
       env:  nil
     }
-    build.obfuscated_config.should == {
+    expect(build.obfuscated_config).to eq({
       language: 'ruby',
       os: 'linux',
       rvm: ['1.8.7'],
       env:  nil
-    }
+    })
   end
 
   it 'removes source key' do
@@ -93,10 +93,10 @@ describe Build::Config::Obfuscate do
       rvm: ['1.8.7'],
       source_key: '1234'
     }
-    build.obfuscated_config.should == {
+    expect(build.obfuscated_config).to eq({
       language: 'ruby',
       os: 'linux',
       rvm: ['1.8.7']
-    }
+    })
   end
 end

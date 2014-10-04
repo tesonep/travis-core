@@ -12,19 +12,19 @@ describe User do
     end
 
     it 'marks new users as such' do
-      user(payload).should be_recently_signed_up
-      user(payload).should_not be_recently_signed_up
+      expect(user(payload)).to be_recently_signed_up
+      expect(user(payload)).not_to be_recently_signed_up
     end
 
     it 'updates changed attributes' do
-      user(payload).attributes.slice(*GITHUB_OAUTH_DATA.keys).should == GITHUB_OAUTH_DATA
+      expect(user(payload).attributes.slice(*GITHUB_OAUTH_DATA.keys)).to eq(GITHUB_OAUTH_DATA)
     end
   end
 
   describe '#to_json' do
     it 'returns JSON representation of user' do
       json = JSON.parse(user.to_json)
-      json['user']['login'].should == 'svenfuchs'
+      expect(json['user']['login']).to eq('svenfuchs')
     end
   end
 
@@ -33,21 +33,21 @@ describe User do
 
     it 'given roles and a condition it returns true if the user has a matching permission for this role' do
       user.permissions.create!(push: true, repository_id: repo.id)
-      user.permission?(['push'], repository_id: repo.id).should be_true
+      expect(user.permission?(['push'], repository_id: repo.id)).to be_truthy
     end
 
     it 'given roles and a condition it returns false if the user does not have a matching permission for this role' do
       user.permissions.create!(pull: true, repository_id: repo.id)
-      user.permission?(['push'], repository_id: repo.id).should be_false
+      expect(user.permission?(['push'], repository_id: repo.id)).to be_falsey
     end
 
     it 'given a condition it returns true if the user has a matching permission' do
       user.permissions.create!(push: true, repository_id: repo.id)
-      user.permission?(repository_id: repo.id).should be_true
+      expect(user.permission?(repository_id: repo.id)).to be_truthy
     end
 
     it 'given a condition it returns true if the user has a matching permission' do
-      user.permission?(repository_id: repo.id).should be_false
+      expect(user.permission?(repository_id: repo.id)).to be_falsey
     end
   end
 
@@ -61,11 +61,11 @@ describe User do
     end
 
     it 'contains the ids of organizations that the user is a member of' do
-      user.organization_ids.should include(travis.id)
+      expect(user.organization_ids).to include(travis.id)
     end
 
     it 'does not contain the ids of organizations that the user is not a member of' do
-      user.organization_ids.should_not include(sinatra.id)
+      expect(user.organization_ids).not_to include(sinatra.id)
     end
   end
 
@@ -80,48 +80,48 @@ describe User do
     end
 
     it 'contains the ids of repositories the user is permitted to see' do
-      user.repository_ids.should include(travis.id)
+      expect(user.repository_ids).to include(travis.id)
     end
 
     it 'does not contain the ids of repositories the user is not permitted to see' do
-      user.repository_ids.should_not include(sinatra.id)
+      expect(user.repository_ids).not_to include(sinatra.id)
     end
   end
 
   describe 'profile_image_hash' do
     it "returns gravatar_id if it's present" do
       user.gravatar_id = '41193cdbffbf06be0cdf231b28c54b18'
-      user.profile_image_hash.should == '41193cdbffbf06be0cdf231b28c54b18'
+      expect(user.profile_image_hash).to eq('41193cdbffbf06be0cdf231b28c54b18')
     end
 
     it 'returns a MD5 hash of the email if no gravatar_id and an email is set' do
       user.gravatar_id = nil
-      user.profile_image_hash.should == Digest::MD5.hexdigest(user.email)
+      expect(user.profile_image_hash).to eq(Digest::MD5.hexdigest(user.email))
     end
 
     it 'returns 32 zeros if no gravatar_id or email is set' do
       user.gravatar_id = nil
       user.email = nil
-      user.profile_image_hash.should == '0' * 32
+      expect(user.profile_image_hash).to eq('0' * 32)
     end
   end
 
   describe 'authenticate_by' do
     describe 'given a valid token and login' do
       it 'authenticates the user' do
-        User.authenticate_by('login' => user.login, 'token' => user.tokens.first.token).should == user
+        expect(User.authenticate_by('login' => user.login, 'token' => user.tokens.first.token)).to eq(user)
       end
     end
 
     describe 'given a wrong token' do
       it 'does not authenticate the user' do
-        User.authenticate_by('login' => 'someone-else', 'token' => user.tokens.first.token).should be_nil
+        expect(User.authenticate_by('login' => 'someone-else', 'token' => user.tokens.first.token)).to be_nil
       end
     end
 
     describe 'given a wrong login' do
       it 'does not authenticate the user' do
-        User.authenticate_by('login' => user.login, 'token' => 'some-other-token').should be_nil
+        expect(User.authenticate_by('login' => user.login, 'token' => 'some-other-token')).to be_nil
       end
     end
 
@@ -132,7 +132,7 @@ describe User do
         Travis::Model::EncryptedColumn.any_instance.stubs(:encrypt? => true, :key => 'abcd', :load => '...')
         Travis::Model::EncryptedColumn.any_instance.expects(:load).with('encrypted-token').returns('a-token')
 
-        User.authenticate_by('login' => user.login, 'token' => 'a-token').should == user
+        expect(User.authenticate_by('login' => user.login, 'token' => 'a-token')).to eq(user)
       end
     end
   end
@@ -151,19 +151,19 @@ describe User do
     end
 
     it "contains repositories where the user has an admin role" do
-      user.service_hooks.should include(own_repo)
+      expect(user.service_hooks).to include(own_repo)
     end
 
     it "does not contain repositories where the user does not have an admin role" do
-      user.service_hooks.should_not include(other_repo)
+      expect(user.service_hooks).not_to include(other_repo)
     end
 
     it "includes all repositories if :all options is passed" do
       hooks = user.service_hooks(:all => true)
-      hooks.should include(own_repo)
-      hooks.should include(push_repo)
-      hooks.should include(admin_repo)
-      hooks.should_not include(other_repo)
+      expect(hooks).to include(own_repo)
+      expect(hooks).to include(push_repo)
+      expect(hooks).to include(admin_repo)
+      expect(hooks).not_to include(other_repo)
     end
   end
 
@@ -179,36 +179,36 @@ describe User do
       Travis::Github.expects(:scopes_for).with(user).returns(['foo', 'bar'])
       user.github_oauth_token = 'new_token'
       user.save!
-      user.github_scopes.should be == ['foo', 'bar']
+      expect(user.github_scopes).to eq(['foo', 'bar'])
     end
 
     it "it resolves github scopes if they haven't been resolved already" do
       Travis::Github.expects(:scopes_for).with(user).returns(['foo', 'bar'])
       user.github_scopes = nil
       user.save!
-      user.github_scopes.should be == ['foo', 'bar']
+      expect(user.github_scopes).to eq(['foo', 'bar'])
     end
 
     it 'returns an empty list if the token is missing' do
       user.github_scopes = ['foo']
       user.github_oauth_token = nil
-      user.github_scopes.should be_empty
+      expect(user.github_scopes).to be_empty
     end
   end
 
   describe 'correct_scopes?' do
     it "accepts correct scopes" do
-      user.should be_correct_scopes
+      expect(user).to be_correct_scopes
     end
 
     it "complains about missing scopes" do
       user.github_scopes.pop
-      user.should_not be_correct_scopes
+      expect(user).not_to be_correct_scopes
     end
 
     it "accepts additional scopes" do
       user.github_scopes << "foo"
-      user.should be_correct_scopes
+      expect(user).to be_correct_scopes
     end
   end
 
@@ -219,7 +219,7 @@ describe User do
       end
 
       it 'does not include the user\'s GitHub OAuth token' do
-        user.inspect.should_not include('foobarbaz')
+        expect(user.inspect).not_to include('foobarbaz')
       end
     end
 
@@ -229,7 +229,7 @@ describe User do
       end
 
       it 'indicates nil GitHub OAuth token' do
-        user.inspect.should include('github_oauth_token: nil')
+        expect(user.inspect).to include('github_oauth_token: nil')
       end
     end
   end

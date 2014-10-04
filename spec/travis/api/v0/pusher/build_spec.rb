@@ -9,7 +9,7 @@ describe Travis::Api::V0::Pusher::Build do
   let(:data)  { Travis::Api::V0::Pusher::Build.new(build).data }
 
   it 'build' do
-    data['build'].except('matrix').should == {
+    expect(data['build'].except('matrix')).to eq({
       'id' => build.id,
       'repository_id' => build.repository_id,
       'number' => 2,
@@ -33,11 +33,11 @@ describe Travis::Api::V0::Pusher::Build do
       'pull_request_title' => nil,
       'pull_request_number' => nil,
       'job_ids' => [1, 2]
-    }
+    })
   end
 
   it 'repository' do
-    data['repository'].should == {
+    expect(data['repository']).to eq({
       'id' => build.repository_id,
       'slug' => 'svenfuchs/minimal',
       'description' => 'the repo description',
@@ -49,6 +49,6 @@ describe Travis::Api::V0::Pusher::Build do
       'last_build_state' => 'started',
       'last_build_language' => nil,
       'github_language' => 'ruby'
-    }
+    })
   end
 end

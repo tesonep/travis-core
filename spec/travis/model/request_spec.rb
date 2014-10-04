@@ -9,7 +9,7 @@ describe Request do
 
   describe 'config_url' do
     it 'returns the raw url to the .travis.yml file on github' do
-      request.config_url.should == 'https://api.github.com/repos/travis-ci/travis-ci/contents/.travis.yml?ref=12345678'
+      expect(request.config_url).to eq('https://api.github.com/repos/travis-ci/travis-ci/contents/.travis.yml?ref=12345678')
     end
   end
 
@@ -18,14 +18,14 @@ describe Request do
       request.event_type = 'pull_request'
       request.payload = { 'pull_request' => { 'title' => 'A pull request' } }
 
-      request.pull_request_title.should == 'A pull request'
+      expect(request.pull_request_title).to eq('A pull request')
     end
 
     it 'returns nil for non pull request' do
       request.event_type = 'build'
       request.payload = { 'pull_request' => { 'title' => 'A pull request' } }
 
-      request.pull_request_title.should be_nil
+      expect(request.pull_request_title).to be_nil
     end
   end
 
@@ -33,13 +33,13 @@ describe Request do
     it 'returns a tag name if available' do
       request.payload = { 'ref' => 'refs/tags/foo' }
 
-      request.tag_name.should == 'foo'
+      expect(request.tag_name).to eq('foo')
     end
 
     it 'returns nil if a tag name is not available' do
       request.payload = { 'ref' => 'refs/heads/foo' }
 
-      request.tag_name.should be_nil
+      expect(request.tag_name).to be_nil
     end
   end
 
@@ -47,13 +47,13 @@ describe Request do
     it 'returns a branch name if available' do
       request.payload = { 'ref' => 'refs/heads/foo' }
 
-      request.branch_name.should == 'foo'
+      expect(request.branch_name).to eq('foo')
     end
 
     it 'returns nil if a branch name is not available' do
       request.payload = { 'ref' => 'refs/tags/foo' }
 
-      request.branch_name.should be_nil
+      expect(request.branch_name).to be_nil
     end
   end
 
@@ -66,7 +66,7 @@ describe Request do
         }
       }
 
-      request.same_repo_pull_request?.should be_true
+      expect(request.same_repo_pull_request?).to be_truthy
     end
 
     it 'returns false if the base and head repos do not match' do
@@ -77,13 +77,13 @@ describe Request do
         }
       }
 
-      request.same_repo_pull_request?.should be_false
+      expect(request.same_repo_pull_request?).to be_falsey
     end
 
     it 'returns false if repo data is not available' do
       request.payload = {}
 
-      request.same_repo_pull_request?.should be_false
+      expect(request.same_repo_pull_request?).to be_falsey
     end
   end
 end

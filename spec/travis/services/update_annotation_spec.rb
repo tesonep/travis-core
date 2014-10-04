@@ -24,8 +24,8 @@ describe Travis::Services::UpdateAnnotation do
         description: 'Foo bar baz',
       }
 
-      lambda { @annotation = service.run }.should issue_queries(7)
-      @annotation.description.should eq(params[:description])
+      expect { @annotation = service.run }.to issue_queries(7)
+      expect(@annotation.description).to eq(params[:description])
     end
 
     it 'updates an existing annotation if one exists' do
@@ -37,7 +37,7 @@ describe Travis::Services::UpdateAnnotation do
       }
 
       annotation = Factory(:annotation, annotation_provider: annotation_provider, job: job)
-      service.run.id.should eq(annotation.id)
+      expect(service.run.id).to eq(annotation.id)
     end
   end
 
@@ -55,7 +55,7 @@ describe Travis::Services::UpdateAnnotation do
         description: 'Foo bar baz',
       }
 
-      service.run.should be_nil
+      expect(service.run).to be_nil
     end
   end
 
@@ -67,6 +67,6 @@ describe Travis::Services::UpdateAnnotation do
       description: 'Foo bar baz',
     }
 
-    service.run.should be_nil
+    expect(service.run).to be_nil
   end
 end

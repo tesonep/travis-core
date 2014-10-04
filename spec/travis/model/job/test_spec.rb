@@ -11,15 +11,15 @@ describe Job::Test do
 
   it 'is cancelable if the job has not finished yet' do
     job = Factory(:test, state: :created)
-    job.should be_cancelable
+    expect(job).to be_cancelable
 
     job = Factory(:test, state: :started)
-    job.should be_cancelable
+    expect(job).to be_cancelable
   end
 
   it 'is not cancelable if the job has already been finished' do
     job = Factory(:test, state: :passed)
-    job.should_not be_cancelable
+    expect(job).not_to be_cancelable
   end
 
   describe 'cancelling' do
@@ -52,8 +52,8 @@ describe Job::Test do
       }.to change { build.canceled_at }
       }.to change { build.repository.reload.last_build_state }
 
-      build.reload.state.should == 'canceled'
-      build.repository.last_build_state.should == 'canceled'
+      expect(build.reload.state).to eq('canceled')
+      expect(build.repository.last_build_state).to eq('canceled')
     end
 
     it 'should set canceled_at and finished_at on job' do
@@ -73,12 +73,12 @@ describe Job::Test do
 
       it 'sets the state to :started' do
         job.start(data)
-        job.state.should == :started
+        expect(job.state).to eq(:started)
       end
 
       it 'sets the worker from the payload' do
         job.start(data)
-        job.worker.should == 'ruby3.worker.travis-ci.org:travis-ruby-4'
+        expect(job.worker).to eq('ruby3.worker.travis-ci.org:travis-ruby-4')
       end
 
       it 'resets the log content' do
@@ -100,8 +100,8 @@ describe Job::Test do
         job.log.removed_at = Time.now
         job.log.removed_by = job.repository.owner
         job.start(data)
-        job.log.removed_at.should be_nil
-        job.log.removed_by.should be_nil
+        expect(job.log.removed_at).to be_nil
+        expect(job.log.removed_by).to be_nil
       end
     end
 
@@ -110,7 +110,7 @@ describe Job::Test do
 
       it 'sets the state to the given result state' do
         job.finish(data)
-        job.state.should == 'passed'
+        expect(job.state).to eq('passed')
       end
 
       it 'notifies observers' do
@@ -129,27 +129,27 @@ describe Job::Test do
 
       it 'sets the state to :created' do
         job.reset!
-        job.reload.state.should == 'created'
+        expect(job.reload.state).to eq('created')
       end
 
       it 'resets job attributes' do
         job.reset!
-        job.reload.queued_at.should be_nil
-        job.reload.finished_at.should be_nil
+        expect(job.reload.queued_at).to be_nil
+        expect(job.reload.finished_at).to be_nil
       end
 
       it 'resets log attributes' do
         job.log.update_attributes!(content: 'foo', aggregated_at: Time.now)
         job.reset!
-        job.reload.log.aggregated_at.should be_nil
-        job.reload.log.content.should be_blank
+        expect(job.reload.log.aggregated_at).to be_nil
+        expect(job.reload.log.content).to be_blank
       end
 
       it 'recreates log if it\'s removed' do
         job.log.destroy
         job.reload
         job.reset!
-        job.reload.log.should_not be_nil
+        expect(job.reload.log).not_to be_nil
       end
 
       xit 'clears log parts' do
@@ -159,7 +159,7 @@ describe Job::Test do
         job.annotations << Factory(:annotation)
         job.reload
         job.reset!
-        job.reload.annotations.should be_empty
+        expect(job.reload.annotations).to be_empty
       end
 
       it 'triggers a :created event' do

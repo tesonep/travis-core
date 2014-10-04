@@ -7,7 +7,7 @@ describe Travis::Api::V1::Webhook::Build::Finished do
   let(:options) { { :include_logs => true } }
 
   it 'includes the build data' do
-    data.except('repository', 'matrix').should == {
+    expect(data.except('repository', 'matrix')).to eq({
       'id' => 1,
       'number' => 2,
       'status' => 0,
@@ -29,21 +29,21 @@ describe Travis::Api::V1::Webhook::Build::Finished do
       'author_name' => 'Sven Fuchs',
       'author_email' => 'svenfuchs@artweb-design.de',
       'type' => 'push',
-    }
+    })
   end
 
   it 'includes the repository' do
-    data['repository'].should == {
+    expect(data['repository']).to eq({
       'id' => 1,
       'name' => 'minimal',
       'owner_name' => 'svenfuchs',
       'url' => 'http://github.com/svenfuchs/minimal'
-    }
+    })
   end
 
   describe 'includes the build matrix' do
     it 'payload' do
-      data['matrix'].first.except('log').should == {
+      expect(data['matrix'].first.except('log')).to eq({
         'id' => 1,
         'repository_id' => 1,
         'parent_id' => 1,
@@ -63,29 +63,29 @@ describe Travis::Api::V1::Webhook::Build::Finished do
         'committer_email' => 'svenfuchs@artweb-design.de',
         'committed_at' => json_format_time(Time.now.utc - 1.hour),
         'compare_url' => 'https://github.com/svenfuchs/minimal/compare/master...develop'
-      }
+      })
     end
 
     it 'given include_logs is true' do
       options.replace :include_logs => true
-      data['matrix'].first['log'].should == 'the test log'
+      expect(data['matrix'].first['log']).to eq('the test log')
     end
 
     it 'given include_logs is false' do
       options.replace :include_logs => false
-      data['matrix'].first['log'].should be_nil
+      expect(data['matrix'].first['log']).to be_nil
     end
 
     it 'has a different type for pull requests' do
       build.stubs(:event_type).returns('pull_request')
-      data['type'].should == 'pull_request'
+      expect(data['type']).to eq('pull_request')
     end
 
     it 'includes the pull request number for pull requests' do
       build.stubs(:event_type).returns('pull_request')
       build.commit.stubs(:pull_request?).returns(true)
       build.commit.stubs(:pull_request_number).returns 1
-      data['pull_request_number'].should == 1
+      expect(data['pull_request_number']).to eq(1)
     end
   end
 end

@@ -88,25 +88,25 @@ describe Travis::Addons::Hipchat::EventHandler do
     it 'returns an array of urls when given a string' do
       rooms = 'd41d8cd98f00b204e9800998ecf8427e'
       build.stubs(:config => { :notifications => { :hipchat => rooms } })
-      handler.targets.should == [rooms]
+      expect(handler.targets).to eq([rooms])
     end
 
     it 'returns an array of urls when given an array' do
       rooms = ['d41d8cd98f00b204e9800998ecf8427e']
       build.stubs(:config => { :notifications => { :hipchat => rooms } })
-      handler.targets.should == rooms
+      expect(handler.targets).to eq(rooms)
     end
 
     it 'returns an array of multiple urls when given a comma separated string' do
       rooms = 'd41d8cd98f00b204e9800998ecf8427e,322fdcced7226b1d66396c68efedb0c1'
       build.stubs(:config => { :notifications => { :hipchat => rooms } })
-      handler.targets.should == rooms.split(',').map(&:strip)
+      expect(handler.targets).to eq(rooms.split(',').map(&:strip))
     end
 
     it 'returns an array of values if the build configuration specifies an array of urls within a config hash' do
       rooms = { :rooms => %w(322fdcced7226b1d66396c68efedb0c1), :on_success => 'change' }
       build.stubs(:config => { :notifications => { :hipchat => rooms } })
-      handler.targets.should == rooms[:rooms]
+      expect(handler.targets).to eq(rooms[:rooms])
     end
   end
 

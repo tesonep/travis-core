@@ -13,12 +13,12 @@ describe Travis::Api::V1::Http::Job do
     end
 
     it 'returns null as a log content' do
-      data['log'].should be_nil
+      expect(data['log']).to be_nil
     end
   end
 
   it 'data' do
-    data.should == {
+    expect(data).to eq({
       'id' => test.id,
       'repository_id' => test.repository_id,
       'number' => '2.1',
@@ -40,7 +40,7 @@ describe Travis::Api::V1::Http::Job do
       'author_email' => 'svenfuchs@artweb-design.de',
       'compare_url' => 'https://github.com/svenfuchs/minimal/compare/master...develop',
       'worker' => 'ruby3.worker.travis-ci.org:travis-ruby-4'
-    }
+    })
   end
 
   context 'with encrypted env vars' do
@@ -49,7 +49,7 @@ describe Travis::Api::V1::Http::Job do
     end
 
     it 'shows encrypted env vars in human readable way' do
-      data['config']['env'].should == 'FOO=[secure]'
+      expect(data['config']['env']).to eq('FOO=[secure]')
     end
   end
 end

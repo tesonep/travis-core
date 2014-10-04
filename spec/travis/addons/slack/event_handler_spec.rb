@@ -90,25 +90,25 @@ describe Travis::Addons::Slack::EventHandler do
     it 'returns an array of urls when given a string' do
       rooms = 'travis:apitoken@42'
       build.stubs(:config => { :notifications => { :slack => rooms } })
-      handler.targets.should == [rooms]
+      expect(handler.targets).to eq([rooms])
     end
 
     it 'returns an array of urls when given an array' do
       rooms = ['travis:apitoken@42']
       build.stubs(:config => { :notifications => { :slack => rooms } })
-      handler.targets.should == rooms
+      expect(handler.targets).to eq(rooms)
     end
 
     it 'returns an array of multiple urls when given a comma separated string' do
       rooms = 'travis:apitoken@42, evome:apitoken@44'
       build.stubs(:config => { :notifications => { :slack => rooms } })
-      handler.targets.should == rooms.split(',').map(&:strip)
+      expect(handler.targets).to eq(rooms.split(',').map(&:strip))
     end
 
     it 'returns an array of values if the build configuration specifies an array of urls within a config hash' do
       rooms = { :rooms => %w(travis:apitoken&42), :on_success => 'change' }
       build.stubs(:config => { :notifications => { :slack => rooms } })
-      handler.targets.should == rooms[:rooms]
+      expect(handler.targets).to eq(rooms[:rooms])
     end
   end
 end

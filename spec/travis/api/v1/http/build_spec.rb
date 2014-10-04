@@ -6,7 +6,7 @@ describe Travis::Api::V1::Http::Build do
   let(:data) { Travis::Api::V1::Http::Build.new(build).data }
 
   it 'build' do
-    data.except('matrix').should == {
+    expect(data.except('matrix')).to eq({
       'id' => 1,
       'event_type' => 'push', # on the build api this probably should be just 'pull_request' => true or similar
       'repository_id' => 1,
@@ -28,11 +28,11 @@ describe Travis::Api::V1::Http::Build do
       'author_name' => 'Sven Fuchs',
       'author_email' => 'svenfuchs@artweb-design.de',
       'compare_url' => 'https://github.com/svenfuchs/minimal/compare/master...develop',
-    }
+    })
   end
 
   it 'matrix' do
-    data['matrix'].first.should == {
+    expect(data['matrix'].first).to eq({
       'id' => 1,
       'repository_id' => 1,
       'number' => '2.1',
@@ -41,7 +41,7 @@ describe Travis::Api::V1::Http::Build do
       'started_at' => json_format_time(Time.now.utc - 1.minute),
       'finished_at' => json_format_time(Time.now.utc),
       'allow_failure' => false
-    }
+    })
   end
 
   context 'with encrypted env vars' do
@@ -50,7 +50,7 @@ describe Travis::Api::V1::Http::Build do
     end
 
     it 'shows encrypted env vars in human readable way' do
-      data['config']['env'].should == 'FOO=[secure]'
+      expect(data['config']['env']).to eq('FOO=[secure]')
     end
   end
 end

@@ -6,7 +6,7 @@ describe Travis::Api::V1::Http::Repository do
   let(:data) { Travis::Api::V1::Http::Repository.new(repository).data }
 
   it 'data' do
-    data.except('public_key').should == {
+    expect(data.except('public_key')).to eq({
       'id' => repository.id,
       'slug' => 'svenfuchs/minimal',
       'description' => 'the repo description',
@@ -18,10 +18,10 @@ describe Travis::Api::V1::Http::Repository do
       'last_build_result' => 0,
       'last_build_language' => nil,
       'last_build_duration' => 60
-    }
+    })
   end
 
   it 'public_key' do
-    data['public_key'].should =~ /-----BEGIN.*PUBLIC KEY-----/
+    expect(data['public_key']).to match(/-----BEGIN.*PUBLIC KEY-----/)
   end
 end

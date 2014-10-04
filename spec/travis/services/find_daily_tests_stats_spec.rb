@@ -10,8 +10,8 @@ describe Travis::Services::FindDailyTestsStats do
 
   it 'should return the jobs per day' do
     stats = service.run
-    stats.should have(1).item
-    stats.first['date'].should == Job.first.created_at.to_date.to_s(:date)
-    stats.first['count'].to_i.should == 13
+    expect(stats.size).to eq(1)
+    expect(stats.first['date']).to eq(Job.first.created_at.to_date.to_s(:date))
+    expect(stats.first['count'].to_i).to eq(13)
   end
 end

@@ -6,7 +6,7 @@ describe Travis::Api::V1::Http::Repositories do
   let(:data) { Travis::Api::V1::Http::Repositories.new([repository]).data }
 
   it 'data' do
-    data.first.should == {
+    expect(data.first).to eq({
       'id' => repository.id,
       'slug' => 'svenfuchs/minimal',
       'description' => 'the repo description',
@@ -18,6 +18,6 @@ describe Travis::Api::V1::Http::Repositories do
       'last_build_result' => 0,
       'last_build_language' => nil,
       'last_build_duration' => 60
-    }
+    })
   end
 end

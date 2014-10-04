@@ -10,7 +10,7 @@ describe Commit do
       before { commit.ref = 'refs/pull/180/merge' }
 
       it 'returns pull request\'s number' do
-        commit.pull_request_number.should == 180
+        expect(commit.pull_request_number).to eq(180)
       end
     end
 
@@ -18,7 +18,7 @@ describe Commit do
       before { commit.ref = 'refs/branch/master' }
 
       it 'returns nil' do
-        commit.pull_request_number.should be_nil
+        expect(commit.pull_request_number).to be_nil
       end
     end
   end
@@ -26,22 +26,22 @@ describe Commit do
   describe 'pull_request?' do
     it 'is false for a nil ref' do
       commit.ref = nil
-      commit.pull_request?.should be_false
+      expect(commit.pull_request?).to be_falsey
     end
 
     it 'is false for a ref named ref/branch/master' do
       commit.ref = 'refs/branch/master'
-      commit.pull_request?.should be_false
+      expect(commit.pull_request?).to be_falsey
     end
 
     it 'is false for a ref named ref/pull/180/head' do
       commit.ref = 'refs/pull/180/head'
-      commit.pull_request?.should be_false
+      expect(commit.pull_request?).to be_falsey
     end
 
     it 'is true for a ref named ref/pull/180/merge' do
       commit.ref = 'refs/pull/180/merge'
-      commit.pull_request?.should be_true
+      expect(commit.pull_request?).to be_truthy
     end
   end
 
@@ -50,7 +50,7 @@ describe Commit do
       before { commit.compare_url = 'https://github.com/rails/rails/compare/ffaab2c4ffee...60790e852a4f' }
 
       it 'returns range' do
-        commit.range.should == 'ffaab2c4ffee...60790e852a4f'
+        expect(commit.range).to eq('ffaab2c4ffee...60790e852a4f')
       end
     end
 
@@ -58,7 +58,7 @@ describe Commit do
       before { commit.compare_url = 'https://github.com/rails/rails/compare/ffaab2c4ffee^...60790e852a4f' }
 
       it 'returns range' do
-        commit.range.should == 'ffaab2c4ffee^...60790e852a4f'
+        expect(commit.range).to eq('ffaab2c4ffee^...60790e852a4f')
       end
     end
 
@@ -66,7 +66,7 @@ describe Commit do
       before { commit.compare_url = 'https://github.com/rails/rails/compare/ffaab2c4ffee.....60790e852a4f' }
 
       it 'returns nil' do
-        commit.range.should be_nil
+        expect(commit.range).to be_nil
       end
     end
 
@@ -74,7 +74,7 @@ describe Commit do
       before { commit.compare_url = nil }
 
       it 'returns nil' do
-        commit.range.should be_nil
+        expect(commit.range).to be_nil
       end
     end
   end

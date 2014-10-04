@@ -5,7 +5,7 @@ describe Travis::Requests::Services::Receive::Push do
 
   describe 'repository' do
     it 'returns all attributes required for a Repository' do
-      payload.repository.should == {
+      expect(payload.repository).to eq({
         :name => 'gem-release',
         :description => 'Release your gems with ease',
         :url => 'http://github.com/svenfuchs/gem-release',
@@ -14,23 +14,23 @@ describe Travis::Requests::Services::Receive::Push do
         :owner_type => 'User',
         :private => false,
         :github_id => 100
-      }
+      })
     end
   end
 
   describe 'owner' do
     it 'returns all attributes required for an Owner' do
-      payload.owner.should == {
+      expect(payload.owner).to eq({
         :type => 'User',
         :login => 'svenfuchs',
         :github_id => 2208
-      }
+      })
     end
   end
 
   describe 'commit' do
     it 'returns all attributes required for a Commit' do
-      payload.commit.should == {
+      expect(payload.commit).to eq({
         :commit => '46ebe012ef3c0be5542a2e2faafd48047127e4be',
         :message => 'Bump to 0.0.15',
         :branch => 'master',
@@ -41,39 +41,39 @@ describe Travis::Requests::Services::Receive::Push do
         :author_name => 'Christopher Floess',
         :author_email => 'chris@flooose.de',
         :compare_url => 'https://github.com/svenfuchs/gem-release/compare/af674bd...9854592'
-      }
+      })
     end
 
     describe 'branch processing' do
       it 'returns head_commit if commits info is not present' do
         payload.event.data['head_commit'] = payload.event.data['commits'].first
         payload.event.data['commits'] = []
-        payload.commit[:commit].should == '586374eac43853e5542a2e2faafd48047127e4be'
+        expect(payload.commit[:commit]).to eq('586374eac43853e5542a2e2faafd48047127e4be')
       end
 
       it 'returns master when ref is ref/heads/master' do
-        payload.commit[:branch].should == 'master'
+        expect(payload.commit[:branch]).to eq('master')
       end
 
       it 'returns travis when ref is ref/heads/travis' do
         payload.event.data['ref'] = "ref/heads/travis"
-        payload.commit[:branch].should == 'travis'
+        expect(payload.commit[:branch]).to eq('travis')
       end
 
       it 'returns features/travis-ci when ref is ref/heads/features/travis-ci' do
         payload.event.data['ref'] = "ref/heads/features/travis-ci"
-        payload.commit[:branch].should == 'features/travis-ci'
+        expect(payload.commit[:branch]).to eq('features/travis-ci')
       end
     end
 
     it 'returns the last commit that isn\'t skipped' do
       payload = Travis::Requests::Services::Receive.payload_for('push', GITHUB_PAYLOADS['skip-last'])
-      payload.commit[:commit].should == '586374eac43853e5542a2e2faafd48047127e4be'
+      expect(payload.commit[:commit]).to eq('586374eac43853e5542a2e2faafd48047127e4be')
     end
 
     it 'returns the last skipped commit if all commits are skipped' do
       payload = Travis::Requests::Services::Receive.payload_for('push', GITHUB_PAYLOADS['skip-all'])
-      payload.commit[:commit].should == '46ebe012ef3c0be5542a2e2faafd48047127e4be'
+      expect(payload.commit[:commit]).to eq('46ebe012ef3c0be5542a2e2faafd48047127e4be')
     end
   end
 end

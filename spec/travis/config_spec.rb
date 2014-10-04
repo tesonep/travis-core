@@ -12,87 +12,87 @@ describe Travis::Config do
 
   describe 'endpoints' do
     it 'returns an object even without endpoints entry' do
-      config.endpoints.foo.should be_nil
+      expect(config.endpoints.foo).to be_nil
     end
 
     it 'returns endpoints if it is set' do
       ENV['travis_config'] = YAML.dump('endpoints' => { 'ssh_key' => true })
-      config.endpoints.ssh_key.should be_true
+      expect(config.endpoints.ssh_key).to be_truthy
     end
 
     it 'allows to set keys on enpoints when it is nil' do
-      config.endpoints.foo.should be_nil
+      expect(config.endpoints.foo).to be_nil
 
       config.endpoints.foo = true
 
-      config.endpoints.foo.should be_true
+      expect(config.endpoints.foo).to be_truthy
     end
   end
 
   describe 'Hashr behaviour' do
     it 'is a Hashr instance' do
-      config.should be_kind_of(Hashr)
+      expect(config).to be_kind_of(Hashr)
     end
 
     it 'returns Hashr instances on subkeys' do
       ENV['travis_config'] = YAML.dump('redis' => { 'url' => 'redis://localhost:6379' })
-      config.redis.should be_kind_of(Hashr)
+      expect(config.redis).to be_kind_of(Hashr)
     end
 
     it 'returns Hashr instances on subkeys that were set to Ruby Hashes' do
       config.foo = { :bar => { :baz => 'baz' } }
-      config.foo.bar.should be_kind_of(Hashr)
+      expect(config.foo.bar).to be_kind_of(Hashr)
     end
   end
 
   describe 'defaults' do
     it 'notifications defaults to []' do
-      config.notifications.should == []
+      expect(config.notifications).to eq([])
     end
 
     it 'notifications.email defaults to {}' do
-      config.email.should == {}
+      expect(config.email).to eq({})
     end
 
     it 'queues defaults to []' do
-      config.queues.should == []
+      expect(config.queues).to eq([])
     end
 
     it 'ampq.host defaults to "localhost"' do
-      config.amqp.host.should == 'localhost'
+      expect(config.amqp.host).to eq('localhost')
     end
 
     it 'ampq.prefetch defaults to 1' do
-      config.amqp.prefetch.should == 1
+      expect(config.amqp.prefetch).to eq(1)
     end
 
     it 'queue.limit.by_owner defaults to {}' do
-      config.queue.limit.by_owner.should == {}
+      expect(config.queue.limit.by_owner).to eq({})
     end
 
     it 'queue.limit.default defaults to 5' do
-      config.queue.limit.default.should == 5
+      expect(config.queue.limit.default).to eq(5)
     end
 
     it 'queue.interval defaults to 3' do
-      config.queue.interval.should == 3
+      expect(config.queue.interval).to eq(3)
     end
 
     it 'queue.interval defaults to 3' do
-      config.queue.interval.should == 3
+      expect(config.queue.interval).to eq(3)
     end
 
     it 'logs.shards defaults to 1' do
-      config.logs.shards.should == 1
+      expect(config.logs.shards).to eq(1)
     end
 
     it 'database' do
-      config.database.should == {
+      expect(config.database).to eq({
         :adapter => 'postgresql',
         :database => 'travis_test',
         :encoding => 'unicode',
         :min_messages => 'warning'
-      }
+      })
     end
   end
 
@@ -100,26 +100,26 @@ describe Travis::Config do
     it 'works when given a url with a port' do
       ENV['DATABASE_URL'] = 'postgres://username:password@hostname:port/database'
 
-      config.database.to_hash.slice(:adapter, :host, :port, :database, :username, :password).should == {
+      expect(config.database.to_hash.slice(:adapter, :host, :port, :database, :username, :password)).to eq({
         :adapter => 'postgresql',
         :host => 'hostname',
         :port => 'port',
         :database => 'database',
         :username => 'username',
         :password => 'password'
-      }
+      })
     end
 
     it 'works when given a url without a port' do
       ENV['DATABASE_URL'] = 'postgres://username:password@hostname/database'
 
-      config.database.to_hash.slice(:adapter, :host, :port, :database, :username, :password).should == {
+      expect(config.database.to_hash.slice(:adapter, :host, :port, :database, :username, :password)).to eq({
         :adapter => 'postgresql',
         :host => 'hostname',
         :database => 'database',
         :username => 'username',
         :password => 'password'
-      }
+      })
     end
   end
 
@@ -128,13 +128,13 @@ describe Travis::Config do
     before(:each) { Travis::Config.stubs(:load_file).returns(data) }
 
     it 'can access pusher' do
-      lambda { config.pusher.key }.should_not raise_error
+      expect { config.pusher.key }.not_to raise_error
     end
 
     it 'can access all keys recursively' do
       nested_access = lambda do |config, data|
         data.keys.each do |key|
-          lambda { config.send(key) }.should_not raise_error
+          expect { config.send(key) }.not_to raise_error
           nested_access.call(config.send(key), data[key]) if data[key].is_a?(Hash)
         end
       end
@@ -144,7 +144,7 @@ describe Travis::Config do
 
   it 'deep symbolizes arrays, too' do
     config = Travis::Config.new('queues' => [{ 'slug' => 'rails/rails', 'queue' => 'rails' }])
-    config.queues.first.values_at(:slug, :queue).should == ['rails/rails', 'rails']
+    expect(config.queues.first.values_at(:slug, :queue)).to eq(['rails/rails', 'rails'])
   end
 end
 

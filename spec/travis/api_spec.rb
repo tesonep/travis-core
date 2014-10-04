@@ -18,18 +18,18 @@ describe Travis::Api do
     describe 'instantiates a builder and returns the data' do
       it 'given an object that responds to :base_class (aka ActiveRecord::Base)' do
         Travis::Api::V1::Http::Repository.expects(:new).with(repo, :some => 'thing').returns(builder)
-        data_for(repo).should == 'data'
+        expect(data_for(repo)).to eq('data')
       end
 
       it 'given an object that responds to :klass (aka Arel::Relation)' do
         Travis::Api::V1::Http::Repositories.expects(:new).with(repos, :some => 'thing').returns(builder)
-        data_for(repos).should == 'data'
+        expect(data_for(repos)).to eq('data')
       end
     end
 
     it 'returns the data from the builder instance' do
       builder.expects(:data).returns('data')
-      data_for(repo).should == 'data'
+      expect(data_for(repo)).to eq('data')
     end
 
     describe '#builder' do
@@ -48,18 +48,18 @@ describe Travis::Api do
 
       it 'finds given constant' do
         const = Travis::Api.builder('', for: :http, type: 'job/test', version: :v5)
-        const.should == Travis::Api::V5::Http::Job::Test
+        expect(const).to eq(Travis::Api::V5::Http::Job::Test)
       end
 
       it 'returns nil if only part of the constant is matched' do
         const = Travis::Api.builder('', for: :foo, type: 'job/test', version: :v5)
-        const.should be_nil
+        expect(const).to be_nil
       end
 
       it 'does not raise an error if constant name is wrong' do
         expect {
           const = Travis::Api.builder('', for: :pusher, type: 'job/test', version: '5')
-          const.should be_nil
+          expect(const).to be_nil
         }.to_not raise_error
       end
     end

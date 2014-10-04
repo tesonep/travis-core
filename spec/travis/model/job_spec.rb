@@ -6,12 +6,12 @@ describe Job do
   describe '.result' do
     it 'returns 1 for failed builds' do
       job = Factory.build(:test, state: :failed)
-      job.result.should == 1
+      expect(job.result).to eq(1)
     end
 
     it 'returns 0 for passed builds' do
       job = Factory.build(:test, state: :passed)
-      job.result.should == 0
+      expect(job.result).to eq(0)
     end
   end
 
@@ -23,9 +23,9 @@ describe Job do
       jobs.third.start!
       jobs.third.finish!(state: 'passed')
 
-      Job.queued.should include(jobs.second)
-      Job.queued.should_not include(jobs.first)
-      Job.queued.should_not include(jobs.third)
+      expect(Job.queued).to include(jobs.second)
+      expect(Job.queued).not_to include(jobs.first)
+      expect(Job.queued).not_to include(jobs.third)
     end
   end
 
@@ -37,32 +37,32 @@ describe Job do
     end
 
     it 'instantiates the log' do
-      job.reload.log.should be_instance_of(Log)
+      expect(job.reload.log).to be_instance_of(Log)
     end
 
     it 'sets the state attribute' do
-      job.reload.should be_created
+      expect(job.reload).to be_created
     end
 
     it 'sets the queue attribute' do
-      job.reload.queue.should == 'builds.linux'
+      expect(job.reload.queue).to eq('builds.linux')
     end
   end
 
   describe 'duration' do
     it 'returns nil if both started_at is not populated' do
       job = Job.new(finished_at: Time.now)
-      job.duration.should be_nil
+      expect(job.duration).to be_nil
     end
 
     it 'returns nil if both finished_at is not populated' do
       job = Job.new(started_at: Time.now)
-      job.duration.should be_nil
+      expect(job.duration).to be_nil
     end
 
     it 'returns the duration if both started_at and finished_at are populated' do
       job = Job.new(started_at: 20.seconds.ago, finished_at: 10.seconds.ago)
-      job.duration.should == 10
+      expect(job.duration).to eq(10)
     end
   end
 
@@ -71,10 +71,10 @@ describe Job do
       job = Job.new(repository: Factory(:repository))
       job.config = { rvm: '1.8.7', env: nil }
 
-      job.obfuscated_config.should == {
+      expect(job.obfuscated_config).to eq({
         rvm: '1.8.7',
         env: nil
-      }
+      })
     end
 
     it 'leaves regular vars untouched' do
@@ -82,10 +82,10 @@ describe Job do
       job.expects(:secure_env_enabled?).at_least_once.returns(true)
       job.config = { rvm: '1.8.7', env: 'FOO=foo' }
 
-      job.obfuscated_config.should == {
+      expect(job.obfuscated_config).to eq({
         rvm: '1.8.7',
         env: 'FOO=foo'
-      }
+      })
     end
 
     it 'obfuscates env vars' do
@@ -96,10 +96,10 @@ describe Job do
                }
       job.config = config
 
-      job.obfuscated_config.should == {
+      expect(job.obfuscated_config).to eq({
         rvm: '1.8.7',
         env: 'BAR=[secure] FOO=foo'
-      }
+      })
     end
 
     it 'normalizes env vars which are hashes to strings' do
@@ -112,10 +112,10 @@ describe Job do
                }
       job.config = config
 
-      job.obfuscated_config.should == {
+      expect(job.obfuscated_config).to eq({
         rvm: '1.8.7',
         env: 'FOO=bar BAR=baz BAR=[secure]'
-      }
+      })
     end
 
     it 'removes addons config if it is not a hash' do
@@ -125,9 +125,9 @@ describe Job do
                }
       job.config = config
 
-      job.obfuscated_config.should == {
+      expect(job.obfuscated_config).to eq({
         rvm: '1.8.7'
-      }
+      })
     end
 
     it 'removes addons config which is not whitelisted' do
@@ -137,12 +137,12 @@ describe Job do
                }
       job.config = config
 
-      job.obfuscated_config.should == {
+      expect(job.obfuscated_config).to eq({
         rvm: '1.8.7',
         addons: {
           firefox: '22.0'
         }
-      }
+      })
     end
 
     it 'removes source key' do
@@ -152,9 +152,9 @@ describe Job do
                }
       job.config = config
 
-      job.obfuscated_config.should == {
+      expect(job.obfuscated_config).to eq({
         rvm: '1.8.7',
-      }
+      })
     end
     context 'when job has secure env disabled' do
       let :job do
@@ -169,10 +169,10 @@ describe Job do
                  }
         job.config = config
 
-        job.obfuscated_config.should == {
+        expect(job.obfuscated_config).to eq({
           rvm: '1.8.7',
           env: 'FOO=foo'
-        }
+        })
       end
 
       it 'works even if it removes all env vars' do
@@ -181,10 +181,10 @@ describe Job do
                  }
         job.config = config
 
-        job.obfuscated_config.should == {
+        expect(job.obfuscated_config).to eq({
           rvm: '1.8.7',
           env: nil
-        }
+        })
       end
 
       it 'normalizes env vars which are hashes to strings' do
@@ -194,10 +194,10 @@ describe Job do
                  }
         job.config = config
 
-        job.obfuscated_config.should == {
+        expect(job.obfuscated_config).to eq({
           rvm: '1.8.7',
           env: 'FOO=bar BAR=baz'
-        }
+        })
       end
     end
   end
@@ -209,7 +209,7 @@ describe Job do
 
       job = Job.new
       job.commit = commit
-      job.pull_request?.should be_true
+      expect(job.pull_request?).to be_truthy
     end
   end
 
@@ -218,11 +218,11 @@ describe Job do
       job = Job.new(repository: Factory(:repository))
       job.config = { rvm: '1.8.7', env: nil, global_env: nil }
 
-      job.decrypted_config.should == {
+      expect(job.decrypted_config).to eq({
         rvm: '1.8.7',
         env: nil,
         global_env: nil
-      }
+      })
     end
 
     it 'normalizes env vars which are hashes to strings' do
@@ -237,11 +237,11 @@ describe Job do
                }
       job.config = config
 
-      job.decrypted_config.should == {
+      expect(job.decrypted_config).to eq({
         rvm: '1.8.7',
         env: ["FOO=bar BAR=baz", "SECURE BAR=barbaz"],
         global_env: ["FOO=foo BAR=bar", "SECURE BAZ=baz"]
-      }
+      })
     end
 
     it 'does not change original config' do
@@ -255,10 +255,10 @@ describe Job do
       job.config = config
 
       job.decrypted_config
-      job.config.should == {
+      expect(job.config).to eq({
         env: [{ secure: 'invalid' }],
         global_env: [{ secure: 'invalid' }]
-      }
+      })
     end
 
     it 'leaves regular vars untouched' do
@@ -266,11 +266,11 @@ describe Job do
       job.expects(:secure_env_enabled?).returns(true).at_least_once
       job.config = { rvm: '1.8.7', env: 'FOO=foo', global_env: 'BAR=bar' }
 
-      job.decrypted_config.should == {
+      expect(job.decrypted_config).to eq({
         rvm: '1.8.7',
         env: ['FOO=foo'],
         global_env: ['BAR=bar']
-      }
+      })
     end
 
     context 'when secure env is not enabled' do
@@ -287,11 +287,11 @@ describe Job do
                  }
         job.config = config
 
-        job.decrypted_config.should == {
+        expect(job.decrypted_config).to eq({
           rvm: '1.8.7',
           env: ['FOO=foo'],
           global_env: ['BAR=bar']
-        }
+        })
       end
 
       it 'removes only secured env vars' do
@@ -300,10 +300,10 @@ describe Job do
                  }
         job.config = config
 
-        job.decrypted_config.should == {
+        expect(job.decrypted_config).to eq({
           rvm: '1.8.7',
           env: ['FOO=foo']
-        }
+        })
       end
     end
 
@@ -320,9 +320,9 @@ describe Job do
                  }
         job.config = config
 
-        job.decrypted_config.should == {
+        expect(job.decrypted_config).to eq({
           rvm: '1.8.7'
-        }
+        })
       end
 
       it 'removes addons items which are not whitelisted' do
@@ -339,14 +339,14 @@ describe Job do
                  }
         job.config = config
 
-        job.decrypted_config.should == {
+        expect(job.decrypted_config).to eq({
           rvm: '1.8.7',
           addons: {
             firefox: '22.0',
             postgresql: '9.3',
             hosts: ["travis.dev"]
           }
-        }
+        })
       end
     end
 
@@ -364,11 +364,11 @@ describe Job do
                  }
         job.config = config
 
-        job.decrypted_config.should == {
+        expect(job.decrypted_config).to eq({
           rvm: '1.8.7',
           env: ['SECURE BAR=barbaz'],
           global_env: ['SECURE BAR=bazbar']
-        }
+        })
       end
 
       it 'decrypts only secure env vars' do
@@ -378,11 +378,11 @@ describe Job do
                  }
         job.config = config
 
-        job.decrypted_config.should == {
+        expect(job.decrypted_config).to eq({
           rvm: '1.8.7',
           env: ['SECURE BAR=bar', 'FOO=foo'],
           global_env: ['SECURE BAZ=baz', 'QUX=qux']
-        }
+        })
       end
     end
 
@@ -404,7 +404,7 @@ describe Job do
                  }
         job.config = config
 
-        job.decrypted_config.should == {
+        expect(job.decrypted_config).to eq({
           rvm: '1.8.7',
           addons: {
             sauce_connect: {
@@ -412,7 +412,7 @@ describe Job do
               access_key: 'foobar'
             }
           }
-        }
+        })
       end
 
       it 'decrypts deploy addon config' do
@@ -421,12 +421,12 @@ describe Job do
                  }
         job.config = config
 
-        job.decrypted_config.should == {
+        expect(job.decrypted_config).to eq({
           rvm: '1.8.7',
           addons: {
             deploy: { foo: 'foobar' }
           }
-        }
+        })
       end
     end
   end
@@ -436,13 +436,13 @@ describe Job do
 
     it 'sets the log content' do
       job.log_content = 'Hello, world'
-      job.log.content.should == 'Hello, world'
+      expect(job.log.content).to eq('Hello, world')
     end
 
     it 'blanks out any old log content' do
       job.log_content = 'foo'
       job.log_content = 'bar'
-      job.log.content.should == 'bar'
+      expect(job.log.content).to eq('bar')
     end
   end
 end

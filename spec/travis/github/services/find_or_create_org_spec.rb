@@ -15,7 +15,7 @@ describe Travis::Github::Services::FindOrCreateOrg do
   it 'finds an existing organization' do
     organization = Factory(:org, login: 'foobar', github_id: 999)
     @params = { github_id: organization.github_id, login: 'foobar' }
-    service.run.should == organization
+    expect(service.run).to eq(organization)
   end
 
   it 'gets login from data if login is not available in find' do
@@ -23,9 +23,9 @@ describe Travis::Github::Services::FindOrCreateOrg do
     @params = { github_id: 999 }
     service.expects(:data).at_least_once.returns({ 'login' => 'foobarbaz' })
 
-    service.run.should == organization
+    expect(service.run).to eq(organization)
 
-    organization.reload.login.should == 'foobarbaz'
+    expect(organization.reload.login).to eq('foobarbaz')
   end
 
   it 'updates repositories owner_name and nullifies other users or orgs\' login if login is changed' do
@@ -42,12 +42,12 @@ describe Travis::Github::Services::FindOrCreateOrg do
     same_login_user = Factory(:user, login: 'foobarbaz', github_id: 998)
     same_login_org  = Factory(:org, login: 'foobarbaz', github_id: 997)
     @params = { github_id: organization.github_id, login: 'foobarbaz' }
-    service.run.should == organization
+    expect(service.run).to eq(organization)
 
-    organization.reload.repositories.map(&:owner_name).uniq.should == ['foobarbaz']
-    same_login_user.reload.login.should be_nil
-    same_login_org.reload.login.should be_nil
-    user_repository.reload.owner_name.should == 'dont_change_me'
+    expect(organization.reload.repositories.map(&:owner_name).uniq).to eq(['foobarbaz'])
+    expect(same_login_user.reload.login).to be_nil
+    expect(same_login_org.reload.login).to be_nil
+    expect(user_repository.reload.owner_name).to eq('dont_change_me')
   end
 
   it 'creates an organization from github' do
@@ -58,9 +58,9 @@ describe Travis::Github::Services::FindOrCreateOrg do
     }.to change { Organization.count }.by(1)
 
     organization = Organization.first
-    organization.name.should == 'Foo Bar'
-    organization.login.should == 'foobar'
-    organization.github_id.should == 999
+    expect(organization.name).to eq('Foo Bar')
+    expect(organization.login).to eq('foobar')
+    expect(organization.github_id).to eq(999)
   end
 
   it 'creates a organization from github and nullifies login if other organization has the same login' do
@@ -75,9 +75,9 @@ describe Travis::Github::Services::FindOrCreateOrg do
       new_org = service.run
     }.to change { Organization.count }.by(1)
 
-    old_user.reload.login.should be_nil
-    old_org.reload.login.should be_nil
-    new_org.login.should == 'foobar'
+    expect(old_user.reload.login).to be_nil
+    expect(old_org.reload.login).to be_nil
+    expect(new_org.login).to eq('foobar')
   end
 
   xit 'raises a GithubApi error if the organization could not be retrieved' do

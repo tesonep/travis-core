@@ -13,7 +13,7 @@ describe Travis::Github::Services::FindOrCreateUser do
   it 'finds an existing user' do
     user = Factory(:user, login: 'foobar', github_id: 999)
     @params = { github_id: user.github_id, login: 'foobar' }
-    service.run.should == user
+    expect(service.run).to eq(user)
   end
 
   it 'gets login from data if login is not available in find' do
@@ -21,9 +21,9 @@ describe Travis::Github::Services::FindOrCreateUser do
     @params = { github_id: 999 }
     service.expects(:data).at_least_once.returns({ 'login' => 'foobarbaz' })
 
-    service.run.should == user
+    expect(service.run).to eq(user)
 
-    user.reload.login.should == 'foobarbaz'
+    expect(user.reload.login).to eq('foobarbaz')
   end
 
   it 'updates repositories owner_name and nullifies other users or orgs\' login if login is changed' do
@@ -40,12 +40,12 @@ describe Travis::Github::Services::FindOrCreateUser do
     same_login_user = Factory(:user, login: 'foobarbaz', github_id: 998)
     same_login_org  = Factory(:org, login: 'foobarbaz', github_id: 997)
     @params = { github_id: user.github_id, login: 'foobarbaz' }
-    service.run.should == user
+    expect(service.run).to eq(user)
 
-    user.reload.repositories.map(&:owner_name).uniq.should == ['foobarbaz']
-    same_login_user.reload.login.should be_nil
-    same_login_org.reload.login.should be_nil
-    org_repository.reload.owner_name.should == 'dont_change_me'
+    expect(user.reload.repositories.map(&:owner_name).uniq).to eq(['foobarbaz'])
+    expect(same_login_user.reload.login).to be_nil
+    expect(same_login_org.reload.login).to be_nil
+    expect(org_repository.reload.owner_name).to eq('dont_change_me')
   end
 
   it 'creates a user from github' do
@@ -56,10 +56,10 @@ describe Travis::Github::Services::FindOrCreateUser do
     }.to change { User.count }.by(1)
 
     user = User.first
-    user.name.should == 'Foo Bar'
-    user.login.should == 'foobar'
-    user.email.should == 'foobar@example.org'
-    user.github_id.should == 999
+    expect(user.name).to eq('Foo Bar')
+    expect(user.login).to eq('foobar')
+    expect(user.email).to eq('foobar@example.org')
+    expect(user.github_id).to eq(999)
   end
 
   it 'creates a user from github and nullifies login if other user has the same login' do
@@ -74,9 +74,9 @@ describe Travis::Github::Services::FindOrCreateUser do
       new_user = service.run
     }.to change { User.count }.by(1)
 
-    old_user.reload.login.should be_nil
-    old_org.reload.login.should be_nil
-    new_user.login.should == 'foobar'
+    expect(old_user.reload.login).to be_nil
+    expect(old_org.reload.login).to be_nil
+    expect(new_user.login).to eq('foobar')
   end
 
   xit 'raises a GithubApi error if the user could not be retrieved' do

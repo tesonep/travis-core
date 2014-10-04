@@ -16,7 +16,7 @@ describe Travis::Services::FindAdmin do
       end
 
       it 'returns that user' do
-        result.should == user
+        expect(result).to eq(user)
       end
     end
 
@@ -27,7 +27,7 @@ describe Travis::Services::FindAdmin do
       end
 
       xit 'raises an exception' do
-        lambda { result }.should raise_error(Travis::AdminMissing, 'no admin available for svenfuchs/minimal')
+        expect { result }.to raise_error(Travis::AdminMissing, 'no admin available for svenfuchs/minimal')
       end
 
       xit 'revokes admin permissions for that user on our side' do
@@ -44,7 +44,7 @@ describe Travis::Services::FindAdmin do
       end
 
       xit 'raises an exception' do
-        lambda { result }.should raise_error(Travis::AdminMissing, 'no admin available for svenfuchs/minimal')
+        expect { result }.to raise_error(Travis::AdminMissing, 'no admin available for svenfuchs/minimal')
       end
 
       it 'does not revoke permissions' do
@@ -81,7 +81,7 @@ describe Travis::Services::FindAdmin::Instrument do
   end
 
   it 'publishes a event' do
-    event.should publish_instrumentation_event(
+    expect(event).to publish_instrumentation_event(
       event: 'travis.services.find_admin.run:completed',
       message: 'Travis::Services::FindAdmin#run:completed for svenfuchs/minimal: svenfuchs',
       result: user,

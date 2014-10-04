@@ -27,22 +27,22 @@ describe Travis::Settings::Collection do
     collection = collection_class.new
     collection.load(json)
     record = collection.first
-    record.id.should == 'ID'
-    record.description.should == 'a record'
-    record.secret.decrypt.should == 'foo'
+    expect(record.id).to eq('ID')
+    expect(record.description).to eq('a record')
+    expect(record.secret.decrypt).to eq('foo')
   end
 
   it 'finds class in Travis::Settings namespace' do
-    collection_class.model.should == Travis::Settings::Foo
+    expect(collection_class.model).to eq(Travis::Settings::Foo)
   end
 
   it 'allows to create a model' do
     SecureRandom.expects(:uuid).returns('uuid')
     collection = collection_class.new
     model = collection.create(description: 'foo')
-    model.description.should == 'foo'
-    collection.to_a.should == [model]
-    model.id.should == 'uuid'
+    expect(model.description).to eq('foo')
+    expect(collection.to_a).to eq([model])
+    expect(model.id).to eq('uuid')
   end
 
   describe '#destroy' do
@@ -50,11 +50,11 @@ describe Travis::Settings::Collection do
       collection = collection_class.new
       item = collection.create(description: 'foo')
 
-      collection.should have(1).item
+      expect(collection.count).to eq(1)
 
       collection.destroy(item.id)
 
-      collection.should have(0).items
+      expect(collection.count).to eq(0)
     end
   end
 
@@ -63,10 +63,10 @@ describe Travis::Settings::Collection do
       collection = collection_class.new
       item = collection.create(description: 'foo')
 
-      collection.should have(1).item
+      expect(collection.count).to eq(1)
 
-      collection.find(item.id).should == item
-      collection.find('foobarbaz').should be_nil
+      expect(collection.find(item.id)).to eq(item)
+      expect(collection.find('foobarbaz')).to be_nil
     end
   end
 end

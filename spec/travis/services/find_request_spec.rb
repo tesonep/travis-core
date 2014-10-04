@@ -10,18 +10,18 @@ describe Travis::Services::FindRequest do
 
   describe 'run' do
     it 'finds a request by the given id' do
-      service.run.should == request
+      expect(service.run).to eq(request)
     end
 
     it 'does not raise if the request could not be found' do
       @params = { :id => request.id + 1 }
-      lambda { service.run }.should_not raise_error
+      expect { service.run }.not_to raise_error
     end
   end
 
   describe 'updated_at' do
     it 'returns request\'s updated_at attribute' do
-      service.updated_at.to_s.should == request.updated_at.to_s
+      expect(service.updated_at.to_s).to eq(request.updated_at.to_s)
     end
   end
 end

@@ -8,14 +8,14 @@ describe Annotation do
   describe 'validations' do
     it 'only allows http or https URLs' do
       annotation.url = 'ftp://travis-ci.org'
-      annotation.save.should be_false
-      annotation.errors[:url].first.should match(/scheme/)
+      expect(annotation.save).to be_falsey
+      expect(annotation.errors[:url].first).to match(/scheme/)
     end
 
     it 'only allows valid URLs' do
       annotation.url = 'http://travis-ci.org:80b/'
-      annotation.save.should be_false
-      annotation.errors[:url].first.should match(/invalid/)
+      expect(annotation.save).to be_falsey
+      expect(annotation.errors[:url].first).to match(/invalid/)
     end
   end
 end

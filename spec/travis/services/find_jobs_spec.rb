@@ -12,17 +12,17 @@ describe Travis::Services::FindJobs do
   describe 'run' do
     it 'finds jobs on the given queue' do
       @params = { :queue => 'builds.linux' }
-      service.run.should include(job)
+      expect(service.run).to include(job)
     end
 
     it 'does not find jobs on other queues' do
       @params = { :queue => 'builds.nodejs' }
-      service.run.should_not include(job)
+      expect(service.run).not_to include(job)
     end
 
     it 'finds jobs by a given list of ids' do
       @params = { :ids => [job.id] }
-      service.run.should == [job]
+      expect(service.run).to eq([job])
     end
 
     it 'finds jobs by state' do
@@ -35,19 +35,19 @@ describe Travis::Services::FindJobs do
       created = Factory(:test, :state => :created, :source => build)
 
       @params = { :state => ['created', 'passed'] }
-      service.run.sort_by(&:id).should == [created, passed].sort_by(&:id)
+      expect(service.run.sort_by(&:id)).to eq([created, passed].sort_by(&:id))
     end
   end
 
   describe 'updated_at' do
     it 'returns the latest updated_at time' do
-      pending 'rack cache is disabled, so not much need for caching now'
+      skip 'rack cache is disabled, so not much need for caching now'
 
       @params = { :queue => 'builds.linux' }
       Job.delete_all
       Factory(:test, :repository => repo, :state => :queued, :queue => 'build.common', :updated_at => Time.now - 1.hour)
       Factory(:test, :repository => repo, :state => :queued, :queue => 'build.common', :updated_at => Time.now)
-      service.updated_at.to_s.should == Time.now.to_s
+      expect(service.updated_at.to_s).to eq(Time.now.to_s)
     end
   end
 end

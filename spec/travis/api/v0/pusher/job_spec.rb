@@ -7,7 +7,7 @@ describe Travis::Api::V0::Pusher::Job::Started do
   let(:data) { Travis::Api::V0::Pusher::Job::Started.new(test).data }
 
   it 'data' do
-    data.except('commit').should == {
+    expect(data.except('commit')).to eq({
       'id' => 1,
       'build_id' => 1,
       'repository_id' => 1,
@@ -21,11 +21,11 @@ describe Travis::Api::V0::Pusher::Job::Started do
       'log_id' => 1,
       'commit_id' => 1,
       'allow_failure' => false
-    }
+    })
   end
 
   it 'should return commit data' do
-    data['commit'].should == {
+    expect(data['commit']).to eq({
       'id' => 1,
       'sha' => '62aae5f70ceee39123ef',
       'branch' => 'master',
@@ -37,7 +37,7 @@ describe Travis::Api::V0::Pusher::Job::Started do
       'author_name' => 'Sven Fuchs',
       'author_email' => 'svenfuchs@artweb-design.de',
       'compare_url' => 'https://github.com/svenfuchs/minimal/compare/master...develop',
-    }
+    })
   end
 end
 

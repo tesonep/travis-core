@@ -13,12 +13,12 @@ describe Travis::Services::FindRequests do
   describe 'run' do
     it 'finds recent requests when older_than is not given' do
       @params = { :repository_id => repo.id }
-      service.run.should == [newer_request, request]
+      expect(service.run).to eq([newer_request, request])
     end
 
     it 'finds requests older than the given id' do
       @params = { :repository_id => repo.id, :older_than => newer_request.id }
-      service.run.should == [request]
+      expect(service.run).to eq([request])
     end
 
     it 'raises an error if repository params are missing' do
@@ -31,7 +31,7 @@ describe Travis::Services::FindRequests do
     it 'scopes to the given repository_id' do
       @params = { :repository_id => repo.id }
       Factory(:request, :repository => Factory(:repository))
-      service.run.should == [newer_request, request]
+      expect(service.run).to eq([newer_request, request])
     end
 
     it 'raises when the repository could not be found' do
@@ -43,19 +43,19 @@ describe Travis::Services::FindRequests do
 
     it 'limits requests if limit is passed' do
       @params = { :repository_id => repo.id, :limit => 1 }
-      service.run.should == [newer_request]
+      expect(service.run).to eq([newer_request])
     end
 
     it 'limits requests to Travis.config.services.find_requests.max_limit if limit is higher' do
       Travis.config.services.find_requests.expects(:max_limit).returns(1)
       @params = { :repository_id => repo.id, :limit => 2 }
-      service.run.should == [newer_request]
+      expect(service.run).to eq([newer_request])
     end
 
     it 'limits requests to Travis.config.services.find_requests.default_limit if limit is not given' do
       Travis.config.services.find_requests.expects(:default_limit).returns(1)
       @params = { :repository_id => repo.id }
-      service.run.should == [newer_request]
+      expect(service.run).to eq([newer_request])
     end
   end
 end

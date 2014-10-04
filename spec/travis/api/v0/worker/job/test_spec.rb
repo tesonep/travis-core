@@ -29,7 +29,7 @@ describe Travis::Api::V0::Worker::Job::Test do
     end
 
     it 'contains the expected data' do
-      data.except('job', 'build', 'repository').should == {
+      expect(data.except('job', 'build', 'repository')).to eq({
         'type' => 'test',
         'config' => { 'rvm' => '1.8.7', 'gemfile' => 'test/Gemfile.rails-2.3.x' },
         'queue' => 'builds.linux',
@@ -47,11 +47,11 @@ describe Travis::Api::V0::Worker::Job::Test do
           'hard_limit' => 180 * 60, # worker handles timeouts in seconds
           'log_silence' => 20 * 60
         }
-      }
+      })
     end
 
     it 'contains the expected job data' do
-      data['job'].should == {
+      expect(data['job']).to eq({
         'id' => 1,
         'number' => '2.1',
         'commit' => '62aae5f70ceee39123ef',
@@ -62,12 +62,12 @@ describe Travis::Api::V0::Worker::Job::Test do
         'pull_request' => false,
         'state' => 'passed',
         'secure_env_enabled' => true
-      }
+      })
     end
 
     it 'contains the expected build data (legacy)' do
       # TODO legacy. remove this once workers respond to a 'job' key
-      data['build'].should == {
+      expect(data['build']).to eq({
         'id' => 1,
         'number' => '2.1',
         'commit' => '62aae5f70ceee39123ef',
@@ -78,11 +78,11 @@ describe Travis::Api::V0::Worker::Job::Test do
         'pull_request' => false,
         'state' => 'passed',
         'secure_env_enabled' => true
-      }
+      })
     end
 
     it 'contains the expected repo data' do
-      data['repository'].should == {
+      expect(data['repository']).to eq({
         'id' => 1,
         'slug' => 'svenfuchs/minimal',
         'source_url' => 'git://github.com/svenfuchs/minimal.git',
@@ -95,13 +95,13 @@ describe Travis::Api::V0::Worker::Job::Test do
         'last_build_state' => 'passed',
         'description' => 'the repo description',
         'github_id' => 549743
-      }
+      })
     end
 
     it "includes the tag name" do
       Travis.config.include_tag_name_in_worker_payload = true
       request.stubs(:tag_name).returns 'v1.2.3'
-      data['job']['tag'].should == 'v1.2.3'
+      expect(data['job']['tag']).to eq('v1.2.3')
     end
   end
 
@@ -119,13 +119,13 @@ describe Travis::Api::V0::Worker::Job::Test do
       end
 
       it 'enables secure env variables' do
-        data['job']['secure_env_enabled'].should be_true
-        data['env_vars'].should have(2).items
+        expect(data['job']['secure_env_enabled']).to be_truthy
+        expect(data['env_vars'].size).to eq(2)
       end
     end
 
     it 'contains the expected data' do
-      data.except('job', 'build', 'repository').should == {
+      expect(data.except('job', 'build', 'repository')).to eq({
         'type' => 'test',
         'config' => { 'rvm' => '1.8.7', 'gemfile' => 'test/Gemfile.rails-2.3.x' },
         'queue' => 'builds.linux',
@@ -142,11 +142,11 @@ describe Travis::Api::V0::Worker::Job::Test do
           'hard_limit' => 180 * 60, # worker handles timeouts in seconds
           'log_silence' => 20 * 60
         }
-      }
+      })
     end
 
     it 'contains the expected job data' do
-      data['job'].should == {
+      expect(data['job']).to eq({
         'id' => 1,
         'number' => '2.1',
         'commit' => '62aae5f70ceee39123ef',
@@ -157,12 +157,12 @@ describe Travis::Api::V0::Worker::Job::Test do
         'pull_request' => 180,
         'state' => 'passed',
         'secure_env_enabled' => false
-      }
+      })
     end
 
     it 'contains the expected build data (legacy)' do
       # TODO legacy. remove this once workers respond to a 'job' key
-      data['build'].should == {
+      expect(data['build']).to eq({
         'id' => 1,
         'number' => '2.1',
         'commit' => '62aae5f70ceee39123ef',
@@ -173,11 +173,11 @@ describe Travis::Api::V0::Worker::Job::Test do
         'pull_request' => 180,
         'state' => 'passed',
         'secure_env_enabled' => false
-      }
+      })
     end
 
     it 'contains the expected repo data' do
-      data['repository'].should == {
+      expect(data['repository']).to eq({
         'id' => 1,
         'slug' => 'svenfuchs/minimal',
         'source_url' => 'git://github.com/svenfuchs/minimal.git',
@@ -190,7 +190,7 @@ describe Travis::Api::V0::Worker::Job::Test do
         'last_build_state' => 'passed',
         'description' => 'the repo description',
         'github_id' => 549743
-      }
+      })
     end
   end
 end

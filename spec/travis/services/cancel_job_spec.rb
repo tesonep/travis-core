@@ -22,11 +22,11 @@ describe Travis::Services::CancelJob do
         service.run
       }.to change { job.reload.state }
 
-      job.state.should == 'canceled'
+      expect(job.state).to eq('canceled')
     end
 
     it 'should not cancel the job if it\'s not cancelable' do
-      job.state.should == :created
+      expect(job.state).to eq(:created)
       job.stubs(:cancelable?).returns(false)
 
       expect {
@@ -37,7 +37,7 @@ describe Travis::Services::CancelJob do
     it 'should not be able to cancel job if user does not have pull permission' do
       user.permissions.destroy_all
 
-      service.can_cancel?.should be_false
+      expect(service.can_cancel?).to be_falsey
     end
   end
 end

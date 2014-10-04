@@ -12,29 +12,29 @@ describe Travis::Notification::Publisher::Log do
   end
 
   it 'writes to Travis.logger' do
-    log.should be_empty
+    expect(log).to be_empty
     publish
-    log.should_not be_empty
+    expect(log).not_to be_empty
   end
 
   it 'prints out the :msg value' do
     publish msg: 'FOO BAR'
-    log.should include('Object#instrumented:completed FOO BAR')
+    expect(log).to include('Object#instrumented:completed FOO BAR')
   end
 
   it 'defaults to INFO' do
     publish(msg: 'foo bar')
-    log.should =~ /I TID=.*? Object#instrumented:completed foo bar/
+    expect(log).to match(/I TID=.*? Object#instrumented:completed foo bar/)
   end
 
   it 'uses ERROR if an exception occured' do
     instrument(exception: true).publish(msg: 'foo bar')
-    log.should =~ /E TID=.*? Object#instrumented:completed foo bar/
+    expect(log).to match(/E TID=.*? Object#instrumented:completed foo bar/)
   end
 
   it 'does not include extra information if no exception occured' do
     publish(foo: 'bar')
-    log.should_not include("foo: 'bar'")
+    expect(log).not_to include("foo: 'bar'")
   end
 
   # it 'does include extra information if no exception occured but log level is DEBUG' do
@@ -44,6 +44,6 @@ describe Travis::Notification::Publisher::Log do
 
   it 'does include extra information if an exception occured' do
     instrument(exception: true).publish(foo: 'bar')
-    log.should include("\"bar\"")
+    expect(log).to include("\"bar\"")
   end
 end

@@ -16,18 +16,18 @@ describe Travis::Addons::Pusher::Instruments::EventHandler do
     it 'publishes a event' do
       subject.notify('job:test:started', test)
 
-      event.should publish_instrumentation_event(
+      expect(event).to publish_instrumentation_event(
         event: 'travis.addons.pusher.event_handler.notify:completed',
         message: 'Travis::Addons::Pusher::EventHandler#notify:completed (job:test:started) for #<Test id=1>',
       )
-      event[:data].except(:payload).should == {
+      expect(event[:data].except(:payload)).to eq({
         repository: 'svenfuchs/minimal',
         request_id: 1,
         object_id: 1,
         object_type: 'Test',
         event: 'job:test:started',
-      }
-      event[:data][:payload].should_not be_nil
+      })
+      expect(event[:data][:payload]).not_to be_nil
     end
   end
 
@@ -35,18 +35,18 @@ describe Travis::Addons::Pusher::Instruments::EventHandler do
     it 'publishes a event' do
       subject.notify('build:finished', build)
 
-      event.should publish_instrumentation_event(
+      expect(event).to publish_instrumentation_event(
         event: 'travis.addons.pusher.event_handler.notify:completed',
         message: 'Travis::Addons::Pusher::EventHandler#notify:completed (build:finished) for #<Build id=1>',
       )
-      event[:data].except(:payload).should == {
+      expect(event[:data].except(:payload)).to eq({
         repository: 'svenfuchs/minimal',
         request_id: 1,
         object_id: 1,
         object_type: 'Build',
         event: 'build:finished',
-      }
-      event[:data][:payload].should_not be_nil
+      })
+      expect(event[:data][:payload]).not_to be_nil
     end
   end
 end

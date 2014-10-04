@@ -9,24 +9,24 @@ describe Travis::SecureConfig do
   let(:crypted) { key.encode('hello world') }
 
   it 'returns the original value if the config is not a hash' do
-    secure.decrypt('hello world').should == 'hello world'
+    expect(secure.decrypt('hello world')).to eq('hello world')
   end
 
   it 'returns nil if secure is nil' do
-    secure.decrypt(secure: nil).should == nil
+    expect(secure.decrypt(secure: nil)).to eq(nil)
   end
 
   it 'decrypts a string' do
-    secure.decrypt(secure: crypted).should == 'hello world'
+    expect(secure.decrypt(secure: crypted)).to eq('hello world')
   end
 
   it 'decrypts with a string as a key' do
-    secure.decrypt('secure' => crypted).should == 'hello world'
+    expect(secure.decrypt('secure' => crypted)).to eq('hello world')
   end
 
   it 'decrypts an array with a secure entry and a string' do
     config = [{ secure: crypted }, 'hola mundo']
-    secure.decrypt(config).should == ['hello world', 'hola mundo']
+    expect(secure.decrypt(config)).to eq(['hello world', 'hola mundo'])
   end
 
   it 'decrypts a hash with a secure entry' do
@@ -34,10 +34,10 @@ describe Travis::SecureConfig do
       english: { secure: crypted },
       spanish: 'hola mundo'
     }
-    secure.decrypt(config).should == {
+    expect(secure.decrypt(config)).to eq({
       english: 'hello world',
       spanish: 'hola mundo'
-    }
+    })
   end
 
   it 'decrypts a complex object of nested arrays and strings' do
@@ -46,11 +46,11 @@ describe Travis::SecureConfig do
       b: 'hello',
       c: { z: { secure: crypted } }
     }
-    secure.decrypt(config).should == {
+    expect(secure.decrypt(config)).to eq({
       a: ['hello world', 'hola mundo', 42],
       b: 'hello',
       c: { z: 'hello world' }
-    }
+    })
   end
 
   it 'decrypts a realistic complex build config' do
@@ -71,7 +71,7 @@ describe Travis::SecureConfig do
       },
       '.configured' => true
     }
-    secure.decrypt(config).should == {
+    expect(secure.decrypt(config)).to eq({
       script: "ruby -e 'p RUBY_VERSION'; true && rake test",
       rvm: ['1.8.7', '1.9.2', '1.9.3', 'rbx', 'jruby'],
       matrix: {
@@ -85,11 +85,11 @@ describe Travis::SecureConfig do
         campfire: 'hello world'
       },
       '.configured' => true
-    }
+    })
   end
 
   it 'keeps the string similar if it cannot be decoded' do
     config = { secure: 'hello world' }
-    secure.decrypt(config).should == 'hello world'
+    expect(secure.decrypt(config)).to eq('hello world')
   end
 end

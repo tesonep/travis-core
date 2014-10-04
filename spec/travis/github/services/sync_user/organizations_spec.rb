@@ -38,43 +38,43 @@ describe Travis::Github::Services::SyncUser::Organizations do
       let(:data) { [{ 'id' => 2, 'login' => 'FooBar' }] }
 
       it 'does not create organization matching "exclude" list' do
-        action.should_not change(Organization, :count)
+        expect(action).not_to change(Organization, :count)
       end
     end
 
     describe 'creates missing organizations' do
       it 'creates missing organizations' do
-        action.should change(Organization, :count).by(1)
+        expect(action).to change(Organization, :count).by(1)
       end
 
       it 'makes the user a member of the organization' do
         action.call
-        user.reload.organizations.should include(Organization.first)
+        expect(user.reload.organizations).to include(Organization.first)
       end
     end
 
     describe 'updates existing organizations' do
       it 'does not create a new organization' do
         Organization.create!(:github_id => 1)
-        action.should_not change(Organization, :count)
+        expect(action).not_to change(Organization, :count)
       end
 
       it 'updates the organization attributes' do
         org = Organization.create!(:github_id => 1, :login => 'small')
         action.call
-        org.reload.login.should == 'mega'
+        expect(org.reload.login).to eq('mega')
       end
 
       it 'makes the user a member of the organization' do
         action.call
-        user.organizations.should include(Organization.first)
+        expect(user.organizations).to include(Organization.first)
       end
     end
 
     it 'removes stale organization memberships' do
       user.organizations << Organization.create!(:github_id => 1)
       action.call
-      user.organizations.should include(Organization.first)
+      expect(user.organizations).to include(Organization.first)
     end
   end
 end
@@ -123,7 +123,7 @@ describe Travis::Github::Services::SyncUser::Organizations::Instrument do
   end
 
   it 'publishes a event on :run' do
-    events[3].should publish_instrumentation_event(
+    expect(events[3]).to publish_instrumentation_event(
       event: 'travis.github.services.sync_user.organizations.run:completed',
       message: %(Travis::Github::Services::SyncUser::Organizations#run:completed for #<User id=#{user.id} login="sven">),
       result: {
@@ -134,7 +134,7 @@ describe Travis::Github::Services::SyncUser::Organizations::Instrument do
   end
 
   it 'publishes a event on :fetch' do
-    events[2].should publish_instrumentation_event(
+    expect(events[2]).to publish_instrumentation_event(
       event: 'travis.github.services.sync_user.organizations.fetch:completed',
       message: %(Travis::Github::Services::SyncUser::Organizations#fetch:completed for #<User id=#{user.id} login="sven">),
       result: data

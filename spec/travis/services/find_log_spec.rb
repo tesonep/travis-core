@@ -12,17 +12,17 @@ describe Travis::Services::FindLog do
   describe 'run' do
     it 'finds the log with the given id' do
       @params = { id: log.id }
-      service.run.should == log
+      expect(service.run).to eq(log)
     end
 
     it 'finds the log with the given job_id' do
       @params = { job_id: job.id }
-      service.run.should == log
+      expect(service.run).to eq(log)
     end
 
     it 'does not raise if the log could not be found' do
       @params = { id: log.id + 1 }
-      lambda { service.run }.should_not raise_error
+      expect { service.run }.not_to raise_error
     end
   end
 

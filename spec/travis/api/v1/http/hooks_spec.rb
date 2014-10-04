@@ -6,7 +6,7 @@ describe Travis::Api::V1::Http::Hooks do
   let(:data) { Travis::Api::V1::Http::Hooks.new([repository]).data }
 
   it 'data' do
-    data.first.should == {
+    expect(data.first).to eq({
       'uid' => 'svenfuchs:minimal',
       'url' => 'https://github.com/svenfuchs/minimal',
       'name' => 'minimal',
@@ -14,7 +14,7 @@ describe Travis::Api::V1::Http::Hooks do
       'description' => 'the repo description',
       'active' => true,
       'private' => false
-    }
+    })
   end
 end
 

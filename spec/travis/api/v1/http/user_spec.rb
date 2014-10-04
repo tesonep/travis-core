@@ -6,7 +6,7 @@ describe Travis::Api::V1::Http::User do
   let(:data) { Travis::Api::V1::Http::User.new(user).data }
 
   it 'data' do
-    data.should == {
+    expect(data).to eq({
       'login' => 'svenfuchs',
       'name' => 'Sven Fuchs',
       'email' => 'svenfuchs@artweb-design.de',
@@ -14,6 +14,6 @@ describe Travis::Api::V1::Http::User do
       'locale' => 'de',
       'is_syncing' => false,
       'synced_at' => json_format_time(Time.now.utc - 1.hour)
-    }
+    })
   end
 end

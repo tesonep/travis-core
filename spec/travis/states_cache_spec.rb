@@ -9,7 +9,7 @@ module Travis
 
     it 'allows to fetch state' do
       adapter.expects(:fetch).with(1, 'master').returns({'state' => 'passed'})
-      subject.fetch_state(1, 'master').should == :passed
+      expect(subject.fetch_state(1, 'master')).to eq(:passed)
     end
 
     it 'gets data from build if it\'s given instead of raw data' do
@@ -28,7 +28,7 @@ module Travis
 
     it 'delegates #fetch to adapter' do
       adapter.expects(:fetch).with(1, 'master').returns({ foo: 'bar' })
-      subject.fetch(1, 'master').should == { foo: 'bar' }
+      expect(subject.fetch(1, 'master')).to eq({ foo: 'bar' })
     end
 
     describe 'integration' do
@@ -39,39 +39,39 @@ module Travis
         begin
           client.flush
         rescue Dalli::DalliError => e
-          pending "Dalli can't run properly, skipping. Cause: #{e.message}"
+          skip "Dalli can't run properly, skipping. Cause: #{e.message}"
         end
       end
 
       it 'saves the state for given branch and globally' do
         data = { finished_at: '2013-04-22T22:10:00', state: 'passed' }.stringify_keys
         subject.write(1, 'master', data)
-        subject.fetch(1)['state'].should == 'passed'
-        subject.fetch(1, 'master')['state'].should == 'passed'
+        expect(subject.fetch(1)['state']).to eq('passed')
+        expect(subject.fetch(1, 'master')['state']).to eq('passed')
 
-        subject.fetch(2).should be_nil
-        subject.fetch(2, 'master').should be_nil
+        expect(subject.fetch(2)).to be_nil
+        expect(subject.fetch(2, 'master')).to be_nil
       end
 
       it 'updates the state only if the info is newer' do
         data = { finished_at: '2013-01-01T12:00:00', state: 'passed' }.stringify_keys
         subject.write(1, 'master', data)
 
-        subject.fetch(1, 'master')['state'].should == 'passed'
+        expect(subject.fetch(1, 'master')['state']).to eq('passed')
 
         data = { finished_at: '2013-02-01T12:00:00', state: 'failed' }.stringify_keys
         subject.write(1, 'development', data)
 
-        subject.fetch(1, 'master')['state'].should == 'passed'
-        subject.fetch(1, 'development')['state'].should == 'failed'
-        subject.fetch(1)['state'].should == 'failed'
+        expect(subject.fetch(1, 'master')['state']).to eq('passed')
+        expect(subject.fetch(1, 'development')['state']).to eq('failed')
+        expect(subject.fetch(1)['state']).to eq('failed')
 
         data = { finished_at: '2013-01-15T12:00:00', state: 'errored' }.stringify_keys
         subject.write(1, 'master', data)
 
-        subject.fetch(1, 'master')['state'].should == 'errored'
-        subject.fetch(1, 'development')['state'].should == 'failed'
-        subject.fetch(1)['state'].should == 'failed'
+        expect(subject.fetch(1, 'master')['state']).to eq('errored')
+        expect(subject.fetch(1, 'development')['state']).to eq('failed')
+        expect(subject.fetch(1)['state']).to eq('failed')
       end
 
       it 'handles connection errors gracefully' do
@@ -98,7 +98,7 @@ module Travis
         json = '{ "state": "passed", "finished_at": "2013-04-22T22:10" }'
         client.expects(:get).with('state:1').returns(json)
 
-        subject.fetch(1).should == { 'state' => 'passed', 'finished_at' => '2013-04-22T22:10' }
+        expect(subject.fetch(1)).to eq({ 'state' => 'passed', 'finished_at' => '2013-04-22T22:10' })
       end
 
       it 'writes for both a branch and default state' do
@@ -117,26 +117,26 @@ module Travis
       context '#update?' do
         it 'returns true if persisted data is older than data passed as an argument' do
           subject.expects(:fetch).with(1, nil).returns({ 'finished_at' => '2013-04-22T22:12' })
-          subject.update?(1, nil, '2013-04-22T22:14').should be_true
+          expect(subject.update?(1, nil, '2013-04-22T22:14')).to be_truthy
 
           subject.expects(:fetch).with(1, 'master').returns({ 'finished_at' => '2013-04-22T22:12' })
-          subject.update?(1, 'master', '2013-04-22T22:14').should be_true
+          expect(subject.update?(1, 'master', '2013-04-22T22:14')).to be_truthy
         end
 
         it 'returns false if persisted data is younger than data passed as an argument' do
           subject.expects(:fetch).with(1, nil).returns({ 'finished_at' => '2013-04-22T22:12' })
-          subject.update?(1, nil, '2013-04-22T22:10').should be_false
+          expect(subject.update?(1, nil, '2013-04-22T22:10')).to be_falsey
 
           subject.expects(:fetch).with(1, 'master').returns({ 'finished_at' => '2013-04-22T22:12' })
-          subject.update?(1, 'master', '2013-04-22T22:10').should be_false
+          expect(subject.update?(1, 'master', '2013-04-22T22:10')).to be_falsey
         end
 
         it 'returns true if persisted data is the same age' do
           subject.expects(:fetch).with(1, nil).returns({ 'finished_at' => '2013-04-22T22:12' })
-          subject.update?(1, nil, '2013-04-22T22:12').should be_false
+          expect(subject.update?(1, nil, '2013-04-22T22:12')).to be_falsey
 
           subject.expects(:fetch).with(1, 'master').returns({ 'finished_at' => '2013-04-22T22:12' })
-          subject.update?(1, 'master', '2013-04-22T22:12').should be_false
+          expect(subject.update?(1, 'master', '2013-04-22T22:12')).to be_falsey
         end
       end
     end
