@@ -6,7 +6,7 @@ RSpec::Matchers.define :be_queued_to do |publisher|
     # jobs.map(&:state).uniq.should == ['queued']
   end
 
-  failure_message_for_should do |jobs|
+  failure_message do |jobs|
     actual = publisher.messages.map { |message| message.first['job']['id'] }
     "expected jobs #{jobs.map(&:id)} to be enqueued. instead we have:\n" +
     "  jobs #{actual} in publish messages\n"
@@ -20,11 +20,11 @@ RSpec::Matchers.define :contain_recipients do |expected|
     expect((actual & expected).size).to eq(expected.size)
   end
 
-  failure_message_for_should do |actual|
+  failure_message do |actual|
     "expected #{actual} to contain #{expected}"
   end
 
-  failure_message_for_should_not do |actual|
+  failure_message_when_negated do |actual|
     "expected #{actual} to not contain #{expected}"
   end
 end
@@ -44,8 +44,8 @@ RSpec::Matchers.define :deliver_to do |expected|
     actual = (email.to || []).map(&:to_s)
 
     description { "be delivered to #{expected.inspect}" }
-    failure_message_for_should { "expected #{email.inspect} to deliver to #{expected.inspect}, but it delivered to #{actual.inspect}" }
-    failure_message_for_should_not { "expected #{email.inspect} not to deliver to #{expected.inspect}, but it did" }
+    failure_message { "expected #{email.inspect} to deliver to #{expected.inspect}, but it delivered to #{actual.inspect}" }
+    failure_message_when_negated { "expected #{email.inspect} not to deliver to #{expected.inspect}, but it did" }
 
     actual.sort == Array(expected).sort
   end
@@ -56,7 +56,7 @@ RSpec::Matchers.define :include_lines do |lines|
     lines   = lines.split("\n").map { |line| line.strip }
     missing = lines.reject { |line| text.include?(line) }
 
-    failure_message_for_should do
+    failure_message do
       "expected\n\n#{text}\n\nto include the lines\n\n#{lines.join("\n")}\n\nbut could not find the lines\n\n#{missing.join("\n")}"
     end
 
@@ -67,8 +67,8 @@ end
 RSpec::Matchers.define :have_message do |event, object|
   match do |pusher|
     description { "have a message #{event.inspect}" }
-    failure_message_for_should { "expected pusher to receive #{event.inspect} but it did not. Instead it has the following messages: #{pusher.messages.map(&:inspect).join(', ')}" }
-    failure_message_for_should_not { "expected pusher not to receive #{event.inspect} but it did" }
+    failure_message { "expected pusher to receive #{event.inspect} but it did not. Instead it has the following messages: #{pusher.messages.map(&:inspect).join(', ')}" }
+    failure_message_when_negated { "expected pusher not to receive #{event.inspect} but it did" }
 
     # TODO need to test for the object/json, too!
     message = pusher.messages.detect { |message| message.first == event }
@@ -96,13 +96,13 @@ RSpec::Matchers.define :be_queued do |*args|
   def jobs
   end
 
-  failure_message_for_should do
+  failure_message do
     @actual ?
       "expected the job queued in #{@queue.inspect} to have the payload #{@actual.inspect} but had #{@expected.inspect}" :
       "expected a job with the payload #{@expected.inspect} to be queued in #{@queue.inspect} but none was found. Instead there are the following jobs:\n\n#{jobs}"
   end
 
-  failure_message_for_should_not do
+  failure_message_when_negated do
     @actual ?
       "expected the job queued in #{@queue.inspect} not to have #{@actual.inspect} but it has" :
       "expected no job with the payload #{@expected.inspect} to be queued in #{@queue.inspect} but it is"

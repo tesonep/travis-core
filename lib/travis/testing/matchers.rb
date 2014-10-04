@@ -10,11 +10,11 @@ RSpec::Matchers.define :issue_queries do |count|
   match do |code|
     queries = call(code)
 
-    failure_message_for_should do
-      (["expected #{count} queries to be issued, but got #{queries.size}:"] + queries).join("\n\n")
-    end
-
     queries.size == count
+  end
+
+  failure_message do
+    (["expected #{count} queries to be issued, but got #{queries.size}:"] + queries).join("\n\n")
   end
 
   def supports_block_expectations?
@@ -37,19 +37,19 @@ RSpec::Matchers.define :publish_instrumentation_event do |data|
     expected_keys = [:uuid, :event, :started_at]
     missing_keys = expected_keys.select { |key| !event.key?(key) }
 
-    failure_message_for_should do
-      message =  "Expected a notification event to be published:\n\n\t#{event.inspect}\n\n"
-      message << "Including:\n\n\t#{data.inspect}\n\n"
+    non_matching.empty? && missing_keys.empty?
+  end
 
-      non_matching.each do |key, expected, actual|
-        message << "#{key.inspect} expected to be\n\n\t#{expected.inspect}\n\nbut was\n\n\t#{actual.inspect}\n\n"
-      end
+  failure_message do
+    message =  "Expected a notification event to be published:\n\n\t#{event.inspect}\n\n"
+    message << "Including:\n\n\t#{data.inspect}\n\n"
 
-      message << "Expected #{missing_keys.map(&:inspect).join(', ')} to be present." if missing_keys.present?
-      message
+    non_matching.each do |key, expected, actual|
+      message << "#{key.inspect} expected to be\n\n\t#{expected.inspect}\n\nbut was\n\n\t#{actual.inspect}\n\n"
     end
 
-    non_matching.empty? && missing_keys.empty?
+    message << "Expected #{missing_keys.map(&:inspect).join(', ')} to be present." if missing_keys.present?
+    message
   end
 end
 
