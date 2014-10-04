@@ -17,6 +17,10 @@ RSpec::Matchers.define :issue_queries do |count|
     queries.size == count
   end
 
+  def supports_block_expectations?
+    true
+  end
+
   def call(code)
     queries = []
     ActiveSupport::Notifications.subscribe 'sql.active_record' do |name, start, finish, id, payload|
