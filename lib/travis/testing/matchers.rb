@@ -33,7 +33,7 @@ RSpec::Matchers.define :publish_instrumentation_event do |data|
     expected_keys = [:uuid, :event, :started_at]
     missing_keys = expected_keys.select { |key| !event.key?(key) }
 
-    failure_message do
+    failure_message_for_should do
       message =  "Expected a notification event to be published:\n\n\t#{event.inspect}\n\n"
       message << "Including:\n\n\t#{data.inspect}\n\n"
 
