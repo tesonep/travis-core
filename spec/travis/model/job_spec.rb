@@ -352,6 +352,26 @@ describe Job do
           }
         }
       end
+
+      it 'decrypts whitelisted addons', :only => true do
+        config = { rvm: '1.8.7',
+                   addons: {
+                     jwt: {
+                       secret: job.repository.key.secure.encrypt('ABC=foobar')
+                     }
+                   }
+                 }
+        job.config = config
+
+        job.decrypted_config.should == {
+          rvm: '1.8.7',
+          addons: {
+            jwt: {
+              secret: 'ABC=foobar'
+            }
+          }
+        }
+      end
     end
 
     context 'when job has secure env enabled' do
