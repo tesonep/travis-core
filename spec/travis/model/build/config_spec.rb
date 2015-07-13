@@ -148,6 +148,13 @@ describe Build::Config do
     Build::Config.new(config).normalize[:os].should == 'osx'
   end
 
+  it 'sets the os value to osx for swift builds' do
+    config = YAML.load %(
+      language: swift
+    )
+    Build::Config.new(config).normalize[:os].should == 'osx'
+  end
+
   it 'sets the os value to linux for other builds' do
     config = YAML.load %(
     )

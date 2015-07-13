@@ -3,6 +3,7 @@ class Build
     class OS
       OS_LANGUAGE_MAP = {
         "objective-c" => "osx",
+        "swift"       => "osx",
       }
       DEFAULT_OS = "linux"
 
