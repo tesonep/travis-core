@@ -15,7 +15,9 @@ addons:
     - coverage/
     - log/
 
-cache: bundler
+cache:
+  bundler: true
+  branch: verbose-logging
 
 sudo: false
 
