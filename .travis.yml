@@ -16,8 +16,7 @@ addons:
     - log/
 
 cache:
-  directories:
-    - vendor/bundle
+  bundler: true
   branch: verbose-logging
 
 sudo: false
