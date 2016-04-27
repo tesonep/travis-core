@@ -4,10 +4,11 @@ require "travis/travis_yml_stats"
 describe Travis::TravisYmlStats do
   let(:publisher) { mock("keen-publisher") }
   subject { described_class.store_stats(request, publisher) }
+  let(:config) { {} }
 
   let(:request) do
     stub({
-      config: {},
+      config: config,
       payload: {
         "repository" => {}
       },
@@ -21,8 +22,16 @@ describe Travis::TravisYmlStats do
     })
   end
 
-  def event_should_contain(opts)
-    publisher.expects(:perform_async).with(has_entries(opts))
+  def requests_should_contain(opts)
+    publisher.expects(:perform_async).with(has_entries(opts), anything, anything)
+  end
+
+  def deployments_should_contain(items)
+    publisher.expects(:perform_async).with(anything, all_of(items.each {|i| includes(i)}), anything)
+  end
+
+  def notifications_should_contain(items)
+    publisher.expects(:perform_async).with(anything, anything, all_of(items.each {|i| includes(i)}))
   end
 
   describe ".travis.yml language key" do
@@ -32,7 +41,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the language key to 'ruby'" do
-        event_should_contain language: "ruby"
+        requests_should_contain language: "ruby"
 
         subject
       end
@@ -40,7 +49,7 @@ describe Travis::TravisYmlStats do
 
     context "when not specified" do
       it "sets the language key to nil" do
-        event_should_contain language: "default"
+        requests_should_contain language: "default"
 
         subject
       end
@@ -52,7 +61,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the language key to 'invalid'" do
-        event_should_contain language: "invalid"
+        requests_should_contain language: "invalid"
 
         subject
       end
@@ -64,7 +73,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "retains the space" do
-        event_should_contain language: "objective c"
+        requests_should_contain language: "objective c"
 
         subject
       end
@@ -78,7 +87,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the github_language key to 'Ruby'" do
-        event_should_contain github_language: "Ruby"
+        requests_should_contain github_language: "Ruby"
 
         subject
       end
@@ -90,7 +99,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the github_language key to 'F#'" do
-        event_should_contain github_language: "F#"
+        requests_should_contain github_language: "F#"
 
         subject
       end
@@ -102,7 +111,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the github_language key to nil" do
-        event_should_contain github_language: nil
+        requests_should_contain github_language: nil
 
         subject
       end
@@ -116,7 +125,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the language_version.ruby key to ['2.1.2']" do
-        event_should_contain language_version: { ruby: ["2.1.2"] }
+        requests_should_contain language_version: { ruby: ["2.1.2"] }
 
         subject
       end
@@ -128,7 +137,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the language_version.ruby key to ['2.0.0', '2.1.2']" do
-        event_should_contain language_version: { ruby: %w[2.0.0 2.1.2] }
+        requests_should_contain language_version: { ruby: %w[2.0.0 2.1.2] }
 
         subject
       end
@@ -140,7 +149,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the language_version.ruby key to ['2.0', '2.1.2']" do
-        event_should_contain language_version: { ruby: %w[2.0 2.1.2] }
+        requests_should_contain language_version: { ruby: %w[2.0 2.1.2] }
 
         subject
       end
@@ -154,7 +163,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the uses_sudo key to true" do
-        event_should_contain uses_sudo: true
+        requests_should_contain uses_sudo: true
 
         subject
       end
@@ -162,7 +171,7 @@ describe Travis::TravisYmlStats do
 
     context "sudo is not used in any commands" do
       it "sets the uses_sudo key to false" do
-        event_should_contain uses_sudo: false
+        requests_should_contain uses_sudo: false
 
         subject
       end
@@ -176,7 +185,7 @@ describe Travis::TravisYmlStats do
       end
 
       it "sets the uses_apt_get key to true" do
-        event_should_contain uses_apt_get: true
+        requests_should_contain uses_apt_get: true
 
         subject
       end
@@ -184,7 +193,7 @@ describe Travis::TravisYmlStats do
 
     context "apt-get is not used in any commands" do
       it "sets the uses_apt_get key to false" do
-        event_should_contain uses_apt_get: false
+        requests_should_contain uses_apt_get: false
 
         subject
       end
@@ -197,7 +206,7 @@ describe Travis::TravisYmlStats do
     end
 
     it "sets the event_type to 'push'" do
-      event_should_contain event_type: "push"
+      requests_should_contain event_type: "push"
 
       subject
     end
@@ -209,7 +218,7 @@ describe Travis::TravisYmlStats do
     end
 
     it "sets the event_type to 'pull_request'" do
-      event_should_contain event_type: "pull_request"
+      requests_should_contain event_type: "pull_request"
 
       subject
     end
@@ -217,21 +226,21 @@ describe Travis::TravisYmlStats do
 
   describe "a build with two jobs" do
     it "sets the matrix_size to 2" do
-      event_should_contain matrix_size: 2
+      requests_should_contain matrix_size: 2
 
       subject
     end
   end
 
   it "owner_type and owner_id are set" do
-    event_should_contain owner_id: 234, owner_type: "User", owner: ["User", 234]
+    requests_should_contain owner_id: 234, owner_type: "User", owner: ["User", 234]
 
     subject
   end
 
   describe "a request without 'dist' key" do
     it "sets the dist_name key to 'default'" do
-      event_should_contain dist_name: 'default'
+      requests_should_contain dist_name: 'default'
 
       subject
     end
@@ -243,7 +252,7 @@ describe Travis::TravisYmlStats do
     end
 
     it "sets the dist_name key to 'trusty'" do
-      event_should_contain dist_name: 'trusty'
+      requests_should_contain dist_name: 'trusty'
 
       subject
     end
@@ -251,7 +260,7 @@ describe Travis::TravisYmlStats do
 
   describe "a request without 'group' key" do
     it "sets the group_name key to 'default'" do
-      event_should_contain group_name: 'default'
+      requests_should_contain group_name: 'default'
 
       subject
     end
@@ -263,8 +272,44 @@ describe Travis::TravisYmlStats do
     end
 
     it "sets the group_name key to 'dev'" do
-      event_should_contain group_name: 'dev'
+      requests_should_contain group_name: 'dev'
 
+      subject
+    end
+  end
+
+  context "when payload contains a single deployment provider" do
+    let(:config) { { "deploy" => { "provider" => "s3" } } }
+
+    it "reports deployment count correctly" do
+      deployments_should_contain( [{:provider => 's3', :repository_id => 123}] )
+      subject
+    end
+  end
+
+  context "when payload contains multiple deployment providers" do
+    let(:config) { { "deploy" => [ { "provider" => "s3" }, { "provider" => "npm" } ] } }
+
+    it "reports deployment count correctly" do
+      deployments_should_contain( [{:provider => 's3', :repository_id => 123}, {:provider => 'npm', :repository_id => 123}] )
+      subject
+    end
+  end
+
+  context "when payload contains multiple deployment providers of the same type" do
+    let(:config) { { "deploy" => [ { "provider" => "s3" }, { "provider" => "s3" } ] } }
+
+    it "reports deployment count correctly" do
+      deployments_should_contain( [{:provider => 's3', :repository_id => 123}] )
+      subject
+    end
+  end
+
+  context "when payload contains notifications" do
+    let(:config) { { "notifications" => { "irc" => "chat.freenode.net#travis" } } }
+
+    it "reports deployment count correctly" do
+      notifications_should_contain( [{:notifier => 'irc', :repository_id => 123}] )
       subject
     end
   end

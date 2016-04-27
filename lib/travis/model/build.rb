@@ -67,6 +67,10 @@ class Build < Travis::Model
       where(state: ['failed', 'passed']).order('id DESC').limit(25)
     end
 
+    def running
+      where(state: ['started']).order('started_at DESC')
+    end
+
     def was_started
       where('state <> ?', :created)
     end
@@ -80,7 +84,7 @@ class Build < Travis::Model
     end
 
     def on_branch(branch)
-      pushes.where(branch.present? ? ['branch IN (?)', normalize_to_array(branch)] : [])
+      api_and_pushes.where(branch.present? ? ['branch IN (?)', normalize_to_array(branch)] : [])
     end
 
     def by_event_type(event_types)
@@ -95,6 +99,10 @@ class Build < Travis::Model
 
     def pull_requests
       where(event_type: 'pull_request')
+    end
+
+    def api_and_pushes
+      by_event_type(['api', 'push'])
     end
 
     def previous(build)
@@ -122,7 +130,7 @@ class Build < Travis::Model
     end
 
     def older_than(build = nil)
-      scope = descending.paged({}) # TODO in which case we'd call older_than without an argument?
+      scope = order('number::integer DESC').paged({}) # TODO in which case we'd call older_than without an argument?
       scope = scope.where('number::integer < ?', (build.is_a?(Build) ? build.number : build).to_i) if build
       scope
     end
@@ -138,7 +146,7 @@ class Build < Travis::Model
       end
   end
 
-  # set the build number and expand the matrix
+  # set the build number and expand the matrix; downcase language
   before_create do
     next_build_number = Travis::Services::NextBuildNumber.new(repository_id: repository.id).run
     self.number = next_build_number
@@ -148,6 +156,10 @@ class Build < Travis::Model
     self.pull_request_number = request.pull_request_number
     self.branch = commit.branch
     expand_matrix
+  end
+
+  after_create do
+    UpdateBranch.new(self).update_last_build unless pull_request?
   end
 
   after_save do
